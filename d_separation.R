@@ -1,10 +1,11 @@
-#This file includes code to show how to compute *-separation using the library "ciflyr"
+#This file includes code to show how to compute *-separation using the function reach() of ciflyr package.
 #We use the following libraries. They can be downloaded from the CRAN Package Repository:
 library(ciflyr)
 library(here)
 library(igraph)
 
-#We will use the function reach(), which is part of the library "ciflyr", which requires
+
+#We will use the function reach(), which is part of the cifly package, which requires
 #1) A "graph" argument as a list of egde list matrices. 
 #2) A "sets" argument as a finite sequence of sets 
 #3) A "ruletable" argument. It can be a txt file, or a written string. 
@@ -47,12 +48,15 @@ OUTPUT ...
 <-- | --> | current not in C
 <-- | <-- | current not in C
 "
+dConnected=parseRuletable(dConnected,tableAsString = TRUE)
 
 #The DAG in the picture is stored in the format required by reach() as follows:
 G <- list("-->" = rbind(c(1,2),c(2,3), c(4,2),c(4,5),c(5,6),c(7,5)))
+G=parseGraph(G, dConnected)
 
 #We will be interested in the set B of all nodes that are d-connected to A={1} by the set C={3,6}
 Sets=list("A" = c(1), "C" = c(3, 6))
+Sets=parseSets(Sets,dConnected)
 
 #Now the function reach() is used to detect all nodes d-connected to the node 1 by the set {3,6}:
 reach(G, Sets, dConnected, tableAsString=TRUE)
@@ -96,31 +100,34 @@ generate_DAG_matrix <- function(p, m) {
 #complexity of this algorithmic implementation:
 
 #Dense graphs: The number of edges m is O(p(p-1)).
-P=50*c(.2,1:40)
-M=as.integer(0.24*P*(P-1))
+P=50*c(.2,1:40) #P is a vector of numbers of nodes p=|V|.
+M=as.integer(0.24*P*(P-1)) #M is a vector of numbers of edges m=|E|.
 #M=as.integer(0.24*P*(sqrt(sqrt(P))))
 #M[1]=21
 #M[2]=588
 #M=as.integer(P)
-S=P+M
-Time_d.sep=rep(0,length(S))
+S=P+M #S is the vector of graph sizes p+m=|V|+|E|. 
+Time_d.sep=rep(0,length(S)) #This vector will contain the execution average time
+#for all the numbers of nodes in P. 
 for (i in 1:length(S)){
-  V=1:P[i]
-  n_sim=3
-  time_sim=rep(0,n_sim)
+  V=1:P[i] #We create the set of nodes V={1,...,p} for all p in P. 
+  n_sim=3 #The number of simulated graphs for each graph size. 
+  time_sim=rep(0,n_sim) #This vector will contain the number the execution times 
+  #for a particular number of nodes p. 
   for (j in 1:n_sim){
-    G_edges=generate_DAG_matrix(P[i],M[i]) 
-    n1=as.integer(P[i]*0.4)
-    n2=as.integer(P[i]*0.2)
-    A_C=sample(V,n1,replace = FALSE)
-    Sets=c(list("A"=A_C[1:n2],"C"=A_C[(n2+1):n1]))
+    G_edges=generate_DAG_matrix(P[i],M[i]) #This generates a DAG
+    n1=as.integer(P[i]*0.4) #This is the numer of nodes in the union AUC.
+    n_A=as.integer(P[i]*0.2) #This is the number of nodes included in A.
+    A_union_C=sample(V,n1,replace = FALSE) #This samples AUC without replacement, 
+    #because we take A and C to be disjoint. 
+    Sets=c(list("A"=A_union_C[1:n_A],"C"=A_union_C[(n_A+1):n1]))
+    Sets=parseSets(Sets,dConnected)
     G=list("-->"=G_edges)
-    time1=Sys.time()
-    reach(G,Sets, StarConnected, tableAsString = TRUE)
-    time2=Sys.time()
-    time_sim[j]=time2-time1
+    G=parseGraph(G,dConnected)
+    t = system.time(reach(G,Sets, StarConnected, tableAsString = TRUE))
+    cpu_time = t["user.self"] + t["sys.self"]
+    time_sim[j]=cpu_time
   }
-  
   Time_d.sep[i]=mean(time_sim)
 }
 
@@ -150,10 +157,13 @@ for (i in 1:length(S)){
     A_C=sample(V,n1,replace = FALSE)
     Sets=c(list("A"=A_C[1:n2],"C"=A_C[(n2+1):n1]))
     G=list("-->"=G_edges)
-    time1=Sys.time()
-    reach(G,Sets, StarConnected, tableAsString = TRUE)
-    time2=Sys.time()
-    time_sim[j]=time2-time1
+    #time1=Sys.time()
+    #reach(G,Sets, StarConnected, tableAsString = TRUE)
+    #time2=Sys.time()
+    #time_sim[j]=time2-time1
+    t = system.time(reach(G,Sets, StarConnected, tableAsString = TRUE))
+    cpu_time = t["user.self"] + t["sys.self"]
+    time_sim[j]=cpu_time
   }
   
   Time_d.sep[i]=mean(time_sim)
@@ -162,8 +172,14 @@ for (i in 1:length(S)){
 #We can plot the execution time vs p+m=|V|+|E| to visually assess the increase rate
 ggplot() + geom_line(aes(x=S,y=Time_d.sep),color='red') + 
   geom_point(aes(x=S,y=Time_d.sep),color='red') +
-  xlab("p+m") + ylab("Execution time") +
+  xlab("p and ") + ylab("Execution time") +
   ggtitle("Time Complexity of d-separation for sparse DAGs")
+
+
+
+
+
+
 
 
 
