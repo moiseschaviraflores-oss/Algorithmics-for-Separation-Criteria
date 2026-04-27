@@ -3,6 +3,7 @@
 library(ciflyr)
 library(here)
 library(igraph)
+library(latex2exp)
 
 #We will use the function reach(), which is part of the library "ciflyr", which requires
 #1) A "graph" argument as a list of egde list matrices. 
@@ -10,7 +11,7 @@ library(igraph)
 #3) A "ruletable" argument. It can be a txt file, or a written string. 
 #4) A logical argument "tableAsString", which must be TRUE if the "tablerule" argument is a string. 
 
-#Consider the DAG with adjacency matrix:
+#Consider the DAG with adjacency matrix: 
 Adj <- matrix(c(0,1,0,0,0,0,0,
                 0,0,1,0,0,0,0,
                 0,0,0,0,0,0,0,
@@ -51,12 +52,15 @@ OUTPUT ... [after]
 <-- [after]  | --> [after]  | current not in C
 <-- [after]  | <-- [after]  | current not in C
 "
+StarConnected=parseRuletable(StarConnected,tableAsString = TRUE)
 
 #The DAG in the picture is stored in the format required by reach() as follows:
 G <- list("-->" = rbind(c(1,2),c(2,3), c(4,2),c(4,5),c(5,6),c(7,5)))
+G <- parseGraph(G,StarConnected)
 
 #We will be interested in the set B of all nodes that are *-connected to A={1} by the set C={3,6}
 Sets=list("A" = c(1), "C" = c(3, 6))
+Sets=parseSets(Sets,StarConnected)
 
 #Now the function reach() is used to detect all nodes *-connected to the node 1 by the set {3,6}:
 reach(G, Sets, StarConnected, tableAsString=TRUE)
@@ -96,10 +100,11 @@ generate_DAG_matrix <- function(p, m) {
   return(selected_edges)
 }
 
+
 #Now we will use the function "generate_DAG_matrix" to run some simulations for assessing the time
 #complexity of this algorithmic implementation:
-#Dense graphs: Note that in this case the number of edges m is O(p(p-1)), i.e, we are analysing dense graphs
-P=50*c(.2,1:40)
+#DENSE GRAPHS: Note that in this case the number of edges m is O(p(p-1)), i.e, we are analysing dense graphs
+P=c(5,10,20,40,80,160,320,640,920,1280,1800)
 M=as.integer(0.24*P*(P-1))
 #M=as.integer(0.24*P*(sqrt(sqrt(P))))
 #M[1]=21
@@ -112,41 +117,46 @@ for (i in 1:length(S)){
   n_sim=3
   time_sim=rep(0,n_sim)
   for (j in 1:n_sim){
-    G_edges=generate_DAG_matrix(P[i],M[i]) 
+    G_edges=generate_DAG_matrix(P[i],M[i])
     n1=as.integer(P[i]*0.4)
     n2=as.integer(P[i]*0.2)
     A_C=sample(V,n1,replace = FALSE)
     Sets=c(list("A"=A_C[1:n2],"C"=A_C[(n2+1):n1]))
+    Sets=parseSets(Sets,StarConnected)
     G=list("-->"=G_edges)
-    time1=Sys.time()
-    reach(G,Sets, StarConnected, tableAsString = TRUE)
-    time2=Sys.time()
-    time_sim[j]=time2-time1
+    G=parseGraph(G,StarConnected)
+    t <- system.time(reach(G,Sets, StarConnected, tableAsString = TRUE))
+    cpu_time <- t["user.self"] + t["sys.self"]
+    #time1=Sys.time()
+    #reach(G,Sets, StarConnected, tableAsString = TRUE)
+    #time2=Sys.time()
+    #time_sim[j]=time2-time1
+    time_sim[j]=cpu_time
   }
   
   Time_star.sep[i]=mean(time_sim)
 }
 
 #We can plot the execution time vs p+m=|V|+|E| to visually assess the increase rate
-ggplot() + geom_line(aes(x=S,y=Time_star.sep),color='red') + 
-           geom_point(aes(x=S,y=Time_star.sep),color='red') +
-           xlab("p+m") + ylab("Execution time") +
-           ggtitle("Time Complexity of *-separation for dense DAGs")
+ggplot() + geom_line(aes(x=P,y=Time_star.sep),color='red') + 
+           geom_point(aes(x=P,y=Time_star.sep),color='red') +
+           xlab("p") + ylab("Execution time") +
+           ggtitle("Time Complexity of *-separation for dense DAGs [m=O(p(p-1))]")
 
 
 #We can also analyse time complexity for the case of sparse DAGs whose number of edges is
 #m=O(p). 
-P=50*c(.2,1:40)
+P=c(5,10,20,40,80,160,320,640,920,1280,1800,2300)
 #M=as.integer(0.24*P*(P-1))
 #M=as.integer(0.24*P*(sqrt(sqrt(P))))
 #M[1]=21
 #M[2]=588
-M=as.integer(P)
+M=as.integer(2*P)
 S=P+M
 Time_star.sep=rep(0,length(S))
 for (i in 1:length(S)){
   V=1:P[i]
-  n_sim=3
+  n_sim=20
   time_sim=rep(0,n_sim)
   for (j in 1:n_sim){
     G_edges=generate_DAG_matrix(P[i],M[i]) 
@@ -154,21 +164,27 @@ for (i in 1:length(S)){
     n2=as.integer(P[i]*0.2)
     A_C=sample(V,n1,replace = FALSE)
     Sets=c(list("A"=A_C[1:n2],"C"=A_C[(n2+1):n1]))
+    Sets=parseSets(Sets,StarConnected)
     G=list("-->"=G_edges)
+    G=parseGraph(G,StarConnected)
+    #t = system.time(reach(G,Sets, StarConnected, tableAsString = TRUE))
+    #cpu_time = t["user.self"] + t["sys.self"]
+    #time_sim[j]=cpu_time
     time1=Sys.time()
     reach(G,Sets, StarConnected, tableAsString = TRUE)
     time2=Sys.time()
-    time_sim[j]=time2-time1
+    time_sim[j]=time2-time1    
   }
   
   Time_star.sep[i]=mean(time_sim)
 }
 
 #We can plot the execution time vs p+m=|V|+|E| to visually assess the increase rate
-ggplot() + geom_line(aes(x=S,y=Time_star.sep),color='red') + 
-  geom_point(aes(x=S,y=Time_star.sep),color='red') +
-  xlab("p+m") + ylab("Execution time") +
-  ggtitle("Time Complexity of *-separation for sparse DAGs")
+ggplot() + geom_line(aes(x=P,y=Time_star.sep),color='red') + 
+  geom_point(aes(x=P,y=Time_star.sep),color='red') +
+  xlab("p") + ylab("Execution time") +
+  ggtitle("Time Complexity of *-separation for sparse DAGs [m=O(p)]")
+
 
 
 
