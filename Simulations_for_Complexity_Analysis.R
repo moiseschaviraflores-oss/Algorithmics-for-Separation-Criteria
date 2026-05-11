@@ -1,6 +1,13 @@
 #Title: Time-Complexity Analysis for Graphical Separation Criteria:
 #Date: May 8th 2026
 
+#The following libraries can be downloaded from the CRAN Package Repository:
+library(ciflyr)
+library(here)
+library(igraph)
+library(latex2exp)
+library(ggplot2)
+
 #This file includes rule tables written as strings for eight different separation criteria.
 #It also include code for generating graphs of different sizes and measuring execution time.
 #This code aims to empirically verify the theoretical claim that these algorithms can be run in linear time. 
@@ -114,10 +121,9 @@ generate_DAG_matrix <- function(p, m) {
 
 ######
 #SPARSE GRAPHS: The number of edges m is O(p).
-set.seed(1773)
 #P <- c(10, 20, 40, 80, 160, 320, 640, 920, 1280, 1800, 2000, 2400, 3000, 3600)
 #P <- c(10, 50, 250, 1000, 5000, 25000, 100000, 500000, 2500000, 10000000,50000000)
-P <- c(100, 500, 1000, 5000, 12000, 25000)
+P <- c(100, 1000, 2000, 4000, 6000, 8000, 10000, 12000, 14000) 
 
 #We take the number of edges to grow linearly with respect to the number of nodes. 
 M <- as.integer(5 * P)
@@ -127,12 +133,13 @@ Time_d.sep_sparse <- rep(0, length(P))
 Time_star.sep_sparse <- rep(0, length(P)) 
 Time_t.sep_sparse <- rep(0, length(P)) 
 
+set.seed(1773)
 for (i in 1:length(P)){
   #We create the set of nodes V={1,...,P[i]}. 
   V <- 1:P[i]  
   
   #The number of simulated graphs for each graph size.
-  n_sim <- 6  
+  n_sim <- 12  
   
   #This vector will contain the number the execution times for a particular number of nodes p
   time_sim_d <- rep(0, n_sim) 
@@ -228,6 +235,177 @@ plot_t_sparse <- ggplot() +
 
 
 
+#DENSE GRAPHS: The number of edges m is O(p).
+#P <- c(10, 20, 40, 80, 160, 320, 640, 920, 1280, 1800, 2000, 2400, 3000, 3600)
+#P <- c(10, 50, 250, 1000, 5000, 25000, 100000, 500000, 2500000, 10000000,50000000)
+P <- c(100, 1000, 2000, 4000, 8000, 10000, 12000, 14000) 
+
+#We take the number of edges to grow linearly with respect to the number of nodes. 
+M <- as.integer(0.20 * P * (P - 1))
+
+#This vector will contain the average execution time all numbers of nodes in P. 
+Time_d.sep_dense <- rep(0, length(P)) 
+#Time_star.sep_dense <- rep(0, length(P)) 
+#Time_t.sep_dense <- rep(0, length(P)) 
+
+set.seed(1773)
+for (i in 1:length(P)){
+  #We create the set of nodes V={1,...,P[i]}. 
+  V <- 1:P[i]  
+  
+  #The number of simulated graphs for each graph size.
+  n_sim <- 12  
+  
+  #This vector will contain the number the execution times for a particular number of nodes p
+  time_sim_d <- rep(0, n_sim) 
+  #time_sim_star <- rep(0, n_sim) 
+  #time_sim_t <- rep(0, n_sim) 
+  
+  for (j in 1:n_sim){
+    #Generate random graph with P[i] nodes.
+    G_edges <- generate_dag_matrix(P[i], M[i]) #This generates a DAG
+    
+    #Number of nodes in the union AUC (40% of the size of V)
+    n1 <- as.integer(P[i] * 0.4) 
+    
+    #Number of nodes in A (20% of the size of V) 
+    n_A <- as.integer(P[i] * 0.2) 
+    
+    #We sample AUC without replacement because A and C must be disjoint.
+    A_union_C <- sample(V, n1, replace = FALSE)
+    
+    #Exclusively for t-connection we need two sets C_A and C_B not necessarily disjoint.
+    #Both of them will have 15% of the size of V.
+    #n.C_A <- as.integer(P[i] * 0.15)
+    #n.C_B <- as.integer(P[i] * 0.15)
+    
+    #C_A <- sample(V, n.C_A, replace = FALSE)
+    #C_B <- sample(V, n.C_B, replace = FALSE)
+    
+    #We split the union AUB into A and B, and parse to pre-process. 
+    Sets <- list("A" = A_union_C[1:n_A], "C" = A_union_C[(n_A+1):n1])
+    #This will be used for d-connection
+    Sets_d <- parseSets(Sets, dConnected)
+    #This will be used for *-connection
+    #Sets_star <- parseSets(Sets, starConnected)
+    #This will be used for t-connection
+    #Sets_t_raw <- list("A" = A_union_C[1:n_A], "C_A" = C_A, "C_B" = C_B)
+    #Sets_t <- parseSets(Sets_t_raw, tConnected)
+    
+    #We pre-process the generated graph for the three criteria, d, *, and t connection. 
+    G <- list("-->" = G_edges)
+    G_d <- parseGraph(G, dConnected)
+    #G_star <- parseGraph(G, starConnected)
+    #G_t <- parseGraph(G, tConnected)
+    
+    #We run "reach" and measure execution time for d-connection 
+    t_d <- system.time(reach(G_d, Sets_d, dConnected))
+    cpu_time_d <- t_d["user.self"] + t_d["sys.self"]
+    time_sim_d[j] <- cpu_time_d
+    
+    #We run "reach" and measure execution time for *-conenction 
+    #t_star <- system.time(reach(G_star, Sets_star, starConnected))
+    #cpu_time_star <- t_star["user.self"] + t_star["sys.self"]
+    #time_sim_star[j] <- cpu_time_star
+    
+    #We run "reach" and measure execution time for t-conenction 
+    #t_t <- system.time(reach(G_t, Sets_t, tConnected))
+    #cpu_time_t <- t_t["user.self"] + t_t["sys.self"]
+    #time_sim_t[j] <- cpu_time_t
+    
+    #time1=Sys.time()
+    #reach(G, Sets, dConnected, tableAsString = TRUE)
+    #time2=Sys.time()
+    #time_sim.2[j] <- time2-time1
+    
+  }
+  #We store the average execution time for 
+  Time_d.sep_dense[i] <- mean(time_sim_d)
+  #Time_star.sep_dense[i] <- mean(time_sim_star)
+  #Time_t.sep_dense[i] <- mean(time_sim_t)
+}
+
+
+#We can plot the execution time vs p=|V| to visually assess the increase rate
+plot_d_dense <- ggplot() + 
+  geom_line(aes(x = P+M, y = Time_d.sep_dense), color = 'navyblue') + 
+  geom_point(aes(x = P+M, y = Time_d.sep_dense), color = 'navyblue') +
+  xlab("p+m") + 
+  ylab("Execution time") +
+  ggtitle("Time Complexity of d-separation for dense DAGs [m=O(p)]")
+
+plot_star_dense <- ggplot() + 
+  geom_line(aes(x = P, y = Time_star.sep_dense), color = 'navyblue') + 
+  geom_point(aes(x = P, y = Time_star.sep_dense), color = 'navyblue') +
+  xlab("p") + 
+  ylab("Execution time") +
+  ggtitle("Time Complexity of *-separation for dense DAGs [m=O(p)]")
+
+plot_t_dense <- ggplot() + 
+  geom_line(aes(x = P, y = Time_t.sep_dense), color = 'navyblue') + 
+  geom_point(aes(x = P, y = Time_t.sep_dense), color = 'navyblue') +
+  xlab("p") + 
+  ylab("Execution time") +
+  ggtitle("Time Complexity of t-separation for dense DAGs [m=O(p)]")
+
+
+
+# --------------------------------------
+#For models based on directed graphs (not necessarily acyclic) the separation criteria are:
+# delta-separation;
+# c-separation; 
+# epsilon-separation.
+
+#The corresponding rule tables are the following.
+#We use the function "parseRuletable" to pre-process rule table strings. 
+#This avoids that the function "reach" takes additional time.
+
+#Rule table to find nodes delta-connected to A by C:
+deltaConnected = "
+EDGES --> <--
+SETS A, C
+START <-- AT A
+OUTPUT --> 
+
+--> | <-- | current in C
+--> | --> | current not in C
+<-- | --> | current not in C
+<-- | <-- | current not in C
+"
+
+#Rule table to find nodes c-connected to A by C:
+cConnected = "
+EDGES --> <--
+SETS A, C
+START <-- AT A
+OUTPUT ...
+
+--> | <-- | current not in C
+"
+
+#Rule table to find nodes c-connected to A by C:
+epsilonConnected = "
+EDGES --> <--
+SETS A, C
+COLORS before, after
+START <-- [before] AT A
+OUTPUT --> [...]
+
+--> [before] | <-- [after]  | current in C
+--> [after]  | <-- [after]  | current in C
+<-- [before] | <-- [before] | current not in C
+<-- [after]  | <-- [after]  | current not in C
+<-- [before] | --> [before] | current not in C
+<-- [after]  | --> [after]  | current not in C
+--> [before] | --> [before] | current not in C
+--> [after]  | --> [after]  | true
+"
+
+
+
+
+
+
 
 
 #ADMG models: m-separation
@@ -250,45 +428,6 @@ OUTPUT ...
 "
 
 
-#DG (directed graphs) models: delta-separation, c-separation, and epsilon-separation.
-#delta-connection
-deltaConnected = "
-EDGES --> <--
-SETS A, C
-START <-- AT X
-OUTPUT --> 
-
---> | <-- | current in C
---> | --> | current not in C
-<-- | --> | current not in C
-<-- | <-- | current not in C
-"
-
-cConnected = "
-EDGES --> <--
-SETS A, C
-START <-- AT X
-OUTPUT ...
-
---> | <-- | current in C
-"
-
-epsilonConnected = "
-EDGES --> <--
-SETS A, C
-COLORS before, after
-START <-- [before] AT A
-OUTPUT --> [...]
-
---> [before] | <-- [after]  | current in C
---> [after]  | <-- [after]  | current in C
-<-- [before] | <-- [before] | current not in C
-<-- [after]  | <-- [after]  | current not in C
-<-- [before] | --> [before] | current not in C
-<-- [after]  | --> [after]  | current not in C
---> [before] | --> [before] | current not in C
---> [after]  | --> [after]  | true
-"
 
 # DMG (directed mixed graphs) models with cycles: mu-separation and sigma-separation
 #mu-connection
