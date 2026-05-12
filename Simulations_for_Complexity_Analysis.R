@@ -1,5 +1,5 @@
 #Title: Time-Complexity Analysis for Graphical Separation Criteria:
-#Date: May 8th 2026
+#Date: May 12th 2026
 
 #The following libraries can be downloaded from the CRAN Package Repository:
 library(ciflyr)
@@ -139,7 +139,7 @@ for (i in 1:length(P)){
   V <- 1:P[i]  
   
   #The number of simulated graphs for each graph size.
-  n_sim <- 12  
+  n_sim <- 10  
   
   #This vector will contain the number the execution times for a particular number of nodes p
   time_sim_d <- rep(0, n_sim) 
@@ -238,7 +238,7 @@ plot_t_sparse <- ggplot() +
 #DENSE GRAPHS: The number of edges m is O(p).
 #P <- c(10, 20, 40, 80, 160, 320, 640, 920, 1280, 1800, 2000, 2400, 3000, 3600)
 #P <- c(10, 50, 250, 1000, 5000, 25000, 100000, 500000, 2500000, 10000000,50000000)
-P <- c(100, 1000, 2000, 4000, 8000, 10000, 12000, 14000) 
+P <- c(100, 1000, 2000, 4000, 6000, 8000, 10000, 12000, 14000) 
 
 #We take the number of edges to grow linearly with respect to the number of nodes. 
 M <- as.integer(0.20 * P * (P - 1))
@@ -254,7 +254,7 @@ for (i in 1:length(P)){
   V <- 1:P[i]  
   
   #The number of simulated graphs for each graph size.
-  n_sim <- 12  
+  n_sim <- 10  
   
   #This vector will contain the number the execution times for a particular number of nodes p
   time_sim_d <- rep(0, n_sim) 
@@ -372,6 +372,8 @@ OUTPUT -->
 <-- | --> | current not in C
 <-- | <-- | current not in C
 "
+deltaConnected=parseRuletable(deltaConnected,tableAsString = TRUE)
+
 
 #Rule table to find nodes c-connected to A by C:
 cConnected = "
@@ -382,6 +384,8 @@ OUTPUT ...
 
 --> | <-- | current not in C
 "
+cConnected=parseRuletable(cConnected,tableAsString = TRUE)
+
 
 #Rule table to find nodes c-connected to A by C:
 epsilonConnected = "
@@ -400,12 +404,230 @@ OUTPUT --> [...]
 --> [before] | --> [before] | current not in C
 --> [after]  | --> [after]  | true
 "
+epsilonConnected=parseRuletable(epsilonConnected,tableAsString = TRUE)
+
+#The following function generates a DG with given number of nodes and edges p and m respectively:
+generate_directed_graph_matrix <- function(p, m) {
+  edges <- matrix(NA, nrow = m, ncol = 2)
+  colnames(edges) <- c("from", "to")
+  
+  seen <- new.env(hash = TRUE)
+  count <- 0
+  
+  while (count < m) {
+    x <- sample(1:p, 1)
+    y <- sample(1:p, 1)
+    
+    if (x != y) {
+      key <- paste(x, y, sep = "-")
+      if (!exists(key, envir = seen)) {
+        count <- count + 1
+        edges[count, ] <- c(x, y)
+        assign(key, TRUE, envir = seen)
+      }
+    }
+  }
+  
+  return(edges)
+}
 
 
 
+#SPARSE GRAPHS: The number of edges m is O(p).
+P <- c(100, 1000, 2000, 4000, 6000, 8000, 10000, 12000, 14000) 
+
+#We take the number of edges to grow linearly with respect to the number of nodes. 
+M <- as.integer(5 * P)
+
+#This vector will contain the average execution time all numbers of nodes in P. 
+Time_delta.sep_sparse <- rep(0, length(P)) 
+Time_c.sep_sparse <- rep(0, length(P))
+Time_epsilon.sep_sparse <- rep(0, length(P)) 
+
+#We set as seed
+set.seed(1773)
+
+for (i in 1:length(P)){
+  #We create the set of nodes V={1,...,P[i]}. 
+  V <- 1:P[i]
+  
+  #The number of simulated graphs for each graph size.
+  n_sim <- 20
+  
+  #This vector will contain the number the execution times for a particular number of nodes p
+  time_sim_delta <- rep(0, n_sim)
+  time_sim_c <- rep(0, n_sim)
+  time_sim_epsilon <- rep(0, n_sim)
+  
+  
+  for (j in 1:n_sim){
+    #Generate random graph with P[i] nodes.
+    G_edges <- generate_directed_graph_matrix(P[i], M[i]) 
+    
+    #Number of nodes in the union AUC (40% of the size of V)
+    n1 <- as.integer(P[i] * 0.4)
+    
+    #Number of nodes in A (20% of the size of V)
+    n2 <- as.integer(P[i] * 0.2)
+    
+    #We sample AUC without replacement to get A and C  disjoint.
+    A_C <- sample(V, n1, replace = FALSE)
+    
+    #We split the union AUB into A and B, and parse to pre-process.
+    Sets <- c(list("A" = A_C[1:n2], "C" = A_C[(n2 + 1):n1]))
+    
+    #This will be used for delta-connection
+    Sets_delta <- parseSets(Sets, deltaConnected)
+    #This will be used for c-connection
+    Sets_c <- parseSets(Sets, cConnected)
+    #This will be used for epsilon-connection
+    Sets_epsilon <- parseSets(Sets, epsilonConnected)
+    
+    #We pre-process the generated graph for the three criteria, delta, c, and epsilon connection.
+    G <- list("-->"=G_edges)
+    G_delta <- parseGraph(G, deltaConnected)
+    G_c <- parseGraph(G, cConnected)
+    G_epsilon <- parseGraph(G, epsilonConnected)
+    
+    t_delta <- system.time(reach(G_delta, Sets_delta, deltaConnected))
+    cpu_time_delta <- t_delta["user.self"] + t_delta["sys.self"]
+    time_sim_delta[j] <- cpu_time_delta
+    
+    t_c <- system.time(reach(G_c, Sets_c, cConnected))
+    cpu_time_c <- t_c["user.self"] + t_c["sys.self"]
+    time_sim_c[j] <- cpu_time_c
+    
+    t_epsilon <- system.time(reach(G_epsilon, Sets_epsilon, epsilonConnected))
+    cpu_time_epsilon <- t_epsilon["user.self"] + t_epsilon["sys.self"]
+    time_sim_epsilon[j] <- cpu_time_epsilon
+  }
+  
+  Time_delta.sep_sparse[i] <- mean(time_sim_delta)
+  Time_c.sep_sparse[i] <- mean(time_sim_c)
+  Time_epsilon.sep_sparse[i] <- mean(time_sim_epsilon)
+}
+
+
+#We can plot the execution time vs p=|V| to visually assess the increase rate
+plot_delta_sparse <- ggplot() + 
+                     geom_line(aes(x = P, y = Time_delta.sep_sparse), color = 'navyblue') + 
+                     geom_point(aes(x = P, y = Time_delta.sep_sparse), color = 'navyblue') +
+                     xlab("p") + 
+                     ylab("Execution time") +
+                     ggtitle("Time Complexity of delta-separation for sparse DAGs [m=O(p)]")
+
+plot_c_sparse <- ggplot() + 
+                 geom_line(aes(x = P, y = Time_c.sep_sparse), color = 'navyblue') + 
+                 geom_point(aes(x = P, y = Time_c.sep_sparse), color = 'navyblue') +
+                 xlab("p") + 
+                 ylab("Execution time") +
+                 ggtitle("Time Complexity of c-separation for sparse DAGs [m=O(p)]")
+
+plot_epsilon_sparse <- ggplot() + 
+                       geom_line(aes(x = P, y = Time_epsilon.sep_sparse), color = 'navyblue') + 
+                       geom_point(aes(x = P, y = Time_epsilon.sep_sparse), color = 'navyblue') +
+                       xlab("p") + 
+                       ylab("Execution time") +
+                       ggtitle("Time Complexity of epsilon-separation for sparse DAGs [m=O(p)]")
 
 
 
+#DENSE GRAPHS: The number of edges m is O(p(p-1)).
+P <- c(100, 1000, 2000, 4000, 6000, 8000, 10000, 12000, 14000) 
+
+#We take the number of edges to grow linearly with respect to the number of nodes. 
+M <- as.integer(0.2 * P * (P-1))
+
+#This vectors will contain the average execution time all numbers of nodes in P. 
+Time_delta.sep_dense <- rep(0, length(P)) 
+Time_c.sep_dense <- rep(0, length(P))
+Time_epsilon.sep_dense <- rep(0, length(P)) 
+
+#We set as seed
+set.seed(1773)
+
+for (i in 1:length(P)){
+  #We create the set of nodes V={1,...,P[i]}. 
+  V <- 1:P[i]
+  
+  #The number of simulated graphs for each graph size.
+  n_sim <- 20
+  
+  #This vector will contain the number the execution times for a particular number of nodes p
+  time_sim_delta <- rep(0, n_sim)
+  time_sim_c <- rep(0, n_sim)
+  time_sim_epsilon <- rep(0, n_sim)
+  
+  
+  for (j in 1:n_sim){
+    #Generate random graph with P[i] nodes.
+    G_edges <- generate_directed_graph_matrix(P[i], M[i]) 
+    
+    #Number of nodes in the union AUC (40% of the size of V)
+    n1 <- as.integer(P[i] * 0.4)
+    
+    #Number of nodes in A (20% of the size of V)
+    n2 <- as.integer(P[i] * 0.2)
+    
+    #We sample AUC without replacement to get A and C  disjoint.
+    A_C <- sample(V, n1, replace = FALSE)
+    
+    #We split the union AUB into A and B, and parse to pre-process.
+    Sets <- c(list("A" = A_C[1:n2], "C" = A_C[(n2 + 1):n1]))
+    
+    #This will be used for delta-connection
+    Sets_delta <- parseSets(Sets, deltaConnected)
+    #This will be used for c-connection
+    Sets_c <- parseSets(Sets, cConnected)
+    #This will be used for epsilon-connection
+    Sets_epsilon <- parseSets(Sets, epsilonConnected)
+    
+    #We pre-process the generated graph for the three criteria, delta, c, and epsilon connection.
+    G <- list("-->"=G_edges)
+    G_delta <- parseGraph(G, deltaConnected)
+    G_c <- parseGraph(G, cConnected)
+    G_epsilon <- parseGraph(G, epsilonConnected)
+    
+    t_delta <- system.time(reach(G_delta, Sets_delta, deltaConnected))
+    cpu_time_delta <- t_delta["user.self"] + t_delta["sys.self"]
+    time_sim_delta[j] <- cpu_time_delta
+    
+    t_c <- system.time(reach(G_c, Sets_c, cConnected))
+    cpu_time_c <- t_c["user.self"] + t_c["sys.self"]
+    time_sim_c[j] <- cpu_time_c
+    
+    t_epsilon <- system.time(reach(G_epsilon, Sets_epsilon, epsilonConnected))
+    cpu_time_epsilon <- t_epsilon["user.self"] + t_epsilon["sys.self"]
+    time_sim_epsilon[j] <- cpu_time_epsilon
+  }
+  
+  Time_delta.sep_dense[i] <- mean(time_sim_delta)
+  Time_c.sep_dense[i] <- mean(time_sim_c)
+  Time_epsilon.sep_dense[i] <- mean(time_sim_epsilon)
+}
+
+
+#We can plot the execution time vs p=|V| to visually assess the increase rate
+plot_delta_dense <- ggplot() + 
+                    geom_line(aes(x = P, y = Time_delta.sep_dense), color = 'navyblue') + 
+                    geom_point(aes(x = P, y = Time_delta.sep_dense), color = 'navyblue') +
+                    xlab("p") + 
+                    ylab("Execution time") +
+                    ggtitle("Time Complexity of delta-separation for dense DAGs [m=O(p(p-1))]")
+
+plot_c_dense <- ggplot() + 
+                geom_line(aes(x = P, y = Time_c.sep_dense), color = 'navyblue') + 
+                geom_point(aes(x = P, y = Time_c.sep_dense), color = 'navyblue') +
+                xlab("p") + 
+                ylab("Execution time") +
+                ggtitle("Time Complexity of c-separation for dense DAGs [m=O(p(p-1))]")
+
+plot_dense_dense <- ggplot() + 
+                     geom_line(aes(x = P, y = Time_epsilon.sep_dense), color = 'navyblue') + 
+                     geom_point(aes(x = P, y = Time_epsilon.sep_dense), color = 'navyblue') +
+                     xlab("p") + 
+                     ylab("Execution time") +
+                     ggtitle("Time Complexity of epsilon-separation for dense DAGs [m=O(p(p-1))]")
 
 
 #ADMG models: m-separation
