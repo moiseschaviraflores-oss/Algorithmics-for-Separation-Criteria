@@ -15,7 +15,7 @@ pip install ciflypy
 For Python the installation should not require any further dependencies. For R, the [Rust](https://rustup.rs/) toolchain must be installed if the package is build on your system, which is the case of Linux distributions.
 
 ## Example with d-separation 
-Now show how to detect d-separation with CIfly in R and Python. The CIfly-based algorithm corresponding to the following rule table (saved as <tt>d_connection_rule_table.txt</tt>) returns the set of all nodes $d$-connected to set $A$ by a set $C$. The rule table can be embedded into the code as a string or loaded via file path such as a .txt file. 
+Now, we show how to detect d-separation with CIfly in R and Python. The CIfly-based algorithm corresponding to the following rule table (saved as <tt>d_connection_rule_table.txt</tt>) returns the set of all nodes $d$-connected to set $A$ by a set $C$. The rule table can be embedded into the code as a string or loaded via file path such as a .txt file. 
 ```{r}
 EDGES --> <--
 SETS A, C
@@ -61,4 +61,26 @@ sets = {"A": [1], "C": [3, 6]}
 
 #Now the function reach() is used to detect all nodes d-connected to the node 1 by the set {3,6}:
 cf.reach(G, sets, dsep_table_path)
+```
+
+## Example with $*$-separation
+The rules that determine whether a walk $w(a,b)$ in DAG $G$ is $*$-connected by a set $C$ are quite similar to the ones that define a $d$-connected walk. However $*$-connection only allows the presence of one collider at most. Thus, we have the following rule table (saved as <tt>star_connection_rule_table.txt</tt>) returns the set of all nodes $*$-connected to set $A$ by a set $C$. This time, we show how to use CIfly when we write a rule table as a written multi-line string in R and Python. 
+
+In R the following code computes the desired task. 
+```{r}
+star_Connected <- "
+EDGES --> <--
+SETS A, C
+COLORS before, after
+START <-- [before] AT A
+OUTPUT ... [after]
+
+--> [before] | <-- [after]  | current in C
+--> [before] | --> [before] | current not in C
+<-- [before] | --> [before] | current not in C
+<-- [before] | <-- [before] | current not in C
+--> [after]  | --> [after]  | current not in C
+<-- [after]  | --> [after]  | current not in C
+<-- [after]  | <-- [after]  | current not in C
+"
 ```
