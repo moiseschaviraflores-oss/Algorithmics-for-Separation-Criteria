@@ -3,12 +3,12 @@ The CIfly algorithmic framework (see this [paper](https://doi.org/10.48550/arXiv
 
 ## Installation
 CIfly can be installed via CRAN in R
-```{r}
+```r
 # R installation via CRAN
 install.packages("ciflyr")
 ```
 And via pip in Python
-```{python}
+```python
 # Python installation with pip
 pip install ciflypy
 ```
@@ -16,7 +16,7 @@ For Python the installation should not require any further dependencies. For R, 
 
 ## Example with d-separation 
 Now, we show how to detect d-separation with CIfly in R and Python. The CIfly-based algorithm corresponding to the following rule table (saved as <tt>d_connection_rule_table.txt</tt>) returns the set of all nodes $d$-connected to set $A$ by a set $C$. The rule table can be embedded into the code as a string or loaded via file path such as a .txt file. 
-```{r}
+```r
 EDGES --> <--
 SETS A, C
 START <-- AT A
@@ -30,7 +30,7 @@ OUTPUT ...
 Consider the directed acyclic graph (DAG) $G=(V,E)$ with $V=\\{1,2,3,4,6,7\\}$ and directed edges $E=\\{1\rightarrow2, 2\rightarrow3, 4\rightarrow2, 4\rightarrow5, 5\rightarrow6, 7\rightarrow5\\}$. Take $A=\\{1\\}$, and $C=\\{3, 6\\}$. 
 
 In R the implement this task as follows.
-```{r}
+```r
 library(ciflyr)
 
 #We call the rule table from the .txt file
@@ -47,11 +47,11 @@ reach(G, Sets, d_Connected_path)
 ```
 
 And we can also do it in Python. 
-```{python}
+```python
 import ciflypy as cf
 
 #We call the rule table from the .txt file
-d_Connection_path = "./d_connection_rule_table.txt"
+d_Connected_path = "./d_connection_rule_table.txt"
 
 #The DAG is stored in a list as an edge list matrix labeled by the edge type "-->"
 G = {"-->": [(1, 2), (2, 3), (4, 2), (4, 5), (5, 6), (7, 5)]}
@@ -60,14 +60,14 @@ G = {"-->": [(1, 2), (2, 3), (4, 2), (4, 5), (5, 6), (7, 5)]}
 sets = {"A": [1], "C": [3, 6]}
 
 #Now the function reach() is used to detect all nodes d-connected to the node 1 by the set {3,6}:
-cf.reach(G, sets, dsep_table_path)
+cf.reach(G, sets, d_Connected_path)
 ```
 
 ## Example with $*$-separation
 The rules that determine whether a walk $w(a,b)$ in DAG $G$ is $\*$-connected by a set $C$ are quite similar to the ones that define a $d$-connected walk. However $\*$-connection only allows the presence of one collider at most. Thus, we have the following rule table (saved as <tt>star_connection_rule_table.txt</tt>) returns the set of all nodes $*$-connected to set $A$ by the set $C$. This time, we show how to use CIfly when we write a rule table as a written multi-line string in R and Python. 
 
 In R the following code computes the desired task. 
-```{r}
+```r
 star_Connected <- "
 EDGES --> <--
 SETS A, C
@@ -85,10 +85,10 @@ OUTPUT ... [after]
 "
 
 #We use function reach() to detect all nodes *-connected to the node 1 by the set {3,6}:
-reach(G, Sets, Star_Connected, tableAsString = TRUE)
+reach(G, Sets, star_Connected, tableAsString = TRUE)
 ```
 The corresponding code for Python is the following.
-```{python}
+```python
 star_Connected = """
 EDGES --> <--
 SETS A, C
@@ -106,5 +106,5 @@ OUTPUT ... [after]
 """
 
 #We use function cf.reach() to detect all nodes *-connected to the node 1 by the set {3,6}:
-cf.reach(G, sets, star_Connected, table_as_string=True)
+cf.reach(G, sets, star_Connected, table_as_string = True)
 ```
