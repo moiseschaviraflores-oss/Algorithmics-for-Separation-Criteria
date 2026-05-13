@@ -64,7 +64,7 @@ cf.reach(G, sets, dsep_table_path)
 ```
 
 ## Example with $*$-separation
-The rules that determine whether a walk $w(a,b)$ in DAG $G$ is $*$-connected by a set $C$ are quite similar to the ones that define a $d$-connected walk. However $*$-connection only allows the presence of one collider at most. Thus, we have the following rule table (saved as <tt>star_connection_rule_table.txt</tt>) returns the set of all nodes $*$-connected to set $A$ by a set $C$. This time, we show how to use CIfly when we write a rule table as a written multi-line string in R and Python. 
+The rules that determine whether a walk $w(a,b)$ in DAG $G$ is $*$-connected by a set $C$ are quite similar to the ones that define a $d$-connected walk. However $*$-connection only allows the presence of one collider at most. Thus, we have the following rule table (saved as <tt>star_connection_rule_table.txt</tt>) returns the set of all nodes $*$-connected to set $A$ by the set $C$. This time, we show how to use CIfly when we write a rule table as a written multi-line string in R and Python. 
 
 In R the following code computes the desired task. 
 ```{r}
@@ -84,5 +84,26 @@ OUTPUT ... [after]
 <-- [after]  | <-- [after]  | current not in C
 "
 
+#Now the function reach() is used to detect all nodes *-connected to the node 1 by the set {3,6}:
+reach(G, Sets, Star_Connected, tableAsString = TRUE)
+```
+The corresponding code for Python is the following.
+```{python}
+star_Connected = """
+EDGES --> <--
+SETS A, C
+COLORS before, after
+START <-- [before] AT A
+OUTPUT ... [after]
 
+--> [before] | <-- [after]  | current in C
+--> [before] | --> [before] | current not in C
+<-- [before] | --> [before] | current not in C
+<-- [before] | <-- [before] | current not in C
+--> [after]  | --> [after]  | current not in C
+<-- [after]  | --> [after]  | current not in C
+<-- [after]  | <-- [after]  | current not in C
+"""
+
+cf.reach(G, sets, star_Connected, table_as_string=True)
 ```
