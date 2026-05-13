@@ -62,6 +62,7 @@ sets = {"A": [1], "C": [3, 6]}
 #Now the function reach() is used to detect all nodes d-connected to the node 1 by the set {3,6}:
 cf.reach(G, sets, d_Connected_path)
 ```
+Both code blocks will provide the set $\\{1,2,3,4,5,6,7\\}$ as an output. 
 
 ## Example with $*$-separation
 The rules that determine whether a walk $w(a,b)$ in DAG $G$ is $\*$-connected by a set $C$ are quite similar to the ones that define a $d$-connected walk. However $\*$-connection only allows the presence of at most one collider (see this [paper](https://proceedings.mlr.press/v161/amendola21a.html) by Améndola et al. 2021). This time, we show how to use CIfly when we write a rule table as a written multi-line string in R and Python. But the rule table saved as as <tt>star_connection_rule_table.txt</tt> can also be used to compute the set of all nodes $*$-connected to set $A$ by the set $C$. 
@@ -108,3 +109,4 @@ OUTPUT ... [after]
 #We use function cf.reach() to detect all nodes *-connected to the node 1 by the set {3,6}:
 cf.reach(G, sets, star_Connected, table_as_string = True)
 ```
+Both code blocks will provide the set $\\{1,2,3,4,5,6\\}$. 
