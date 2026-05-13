@@ -1,5 +1,5 @@
 # Algorithmics for Separation Criteria 
-The CIfly algorithmic framework (cite Wienoebst et al.) has been proposed to solve wide variety of tasks involving graphical objects. This= article focuses on how to to use the CIfly framework to detect other graphical separation criteria. The CIfly framework is available for R as <tt>ciflyr</tt>, and for Python as <tt>ciflypy</tt>.  
+The CIfly algorithmic framework (see this [paper](https://doi.org/10.48550/arXiv.2506.15758) by Wienöobst et al., 2025) has been proposed to solve wide variety of causal inference tasks. This article focuses on how to use CIfly for the creation of algorithms to detect graphical separation patterns for different criteria. The CIfly framework is available for R as <tt>ciflyr</tt>, and for Python as <tt>ciflypy</tt>.  
 
 ## Installation
 CIfly can be installed via CRAN in R
