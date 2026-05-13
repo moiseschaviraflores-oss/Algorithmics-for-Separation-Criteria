@@ -1,0 +1,13 @@
+EDGES --> <--
+SETS A, C
+COLORS before, after
+START <-- [before] AT A
+OUTPUT ... [after]
+
+--> [before] | <-- [after]  | current in C
+--> [before] | --> [before] | current not in C
+<-- [before] | --> [before] | current not in C
+<-- [before] | <-- [before] | current not in C
+--> [after]  | --> [after]  | current not in C
+<-- [after]  | --> [after]  | current not in C
+<-- [after]  | <-- [after]  | current not in C
