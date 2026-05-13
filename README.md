@@ -84,7 +84,7 @@ OUTPUT ... [after]
 <-- [after]  | <-- [after]  | current not in C
 "
 
-#Now the function reach() is used to detect all nodes *-connected to the node 1 by the set {3,6}:
+#We use function reach() to detect all nodes *-connected to the node 1 by the set {3,6}:
 reach(G, Sets, Star_Connected, tableAsString = TRUE)
 ```
 The corresponding code for Python is the following.
@@ -105,5 +105,6 @@ OUTPUT ... [after]
 <-- [after]  | <-- [after]  | current not in C
 """
 
+#We use function cf.reach() to detect all nodes *-connected to the node 1 by the set {3,6}:
 cf.reach(G, sets, star_Connected, table_as_string=True)
 ```
