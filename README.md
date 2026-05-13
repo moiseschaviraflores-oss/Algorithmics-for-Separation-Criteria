@@ -1,4 +1,4 @@
-## Algorithmics for Separation Criteria 
+# Algorithmics for Separation Criteria 
 The CIfly algorithmic framework (cite Wienoebst et al.) has been proposed to solve wide variety of tasks involving graphical objects. This= article focuses on how to to use the CIfly framework to detect other graphical separation criteria. The CIfly framework is available for R as <tt>ciflyr</tt>, and for Python as <tt>ciflypy</tt>.  
 
 ## Installation
@@ -15,7 +15,7 @@ pip install ciflypy
 For Python the installation should not require any further dependencies. For R, the [Rust](https://rustup.rs/) toolchain must be installed if the package is build on your system, which is the case of Linux distributions.
 
 ## Example with d-separation 
-Now show how to detect d-separation with CIfly in R and Python. The CIfly algorithm specified by the following rule table (saved in the file d_connection_rule_table.txt) returns all nodes d-connected to set A by a set C.
+Now show how to detect d-separation with CIfly in R and Python. The CIfly-based algorithm corresponding to the following rule table (saved as <tt>d_connection_rule_table.txt</tt>) returns the set of all nodes $d$-connected to set $A$ by a set $C$. The rule table can be embedded into the code as a string or loaded via file path such as a .txt file. 
 ```{r}
 EDGES --> <--
 SETS A, C
@@ -26,4 +26,39 @@ OUTPUT ...
 -->  | -->  | current not in C
 <--  | -->  | current not in C
 <--  | <--  | current not in C
+```
+Consider the directed acyclic graph (DAG) $G=(V,E)$ with $V=\\{1,2,3,4,6,7\\}$ and directed edges $E=\\{1\rightarrow2, 2\rightarrow3, 4\rightarrow2, 4\rightarrow5, 5\rightarrow6, 7\rightarrow5\\}$. Take $A=\\{1\\}$, and $C=\\{3, 6\\}$. 
+
+In R the implement this task as follows.
+```{r}
+library(ciflyr)
+
+#We call the rule table from the .txt file
+d_Connected_path <- "./d_connection_rule_table.txt"
+
+#The DAG is stored in a list as an edge list matrix labeled by the edge type "-->"
+G <- list("-->" = rbind(c(1, 2), c(2, 3), c(4, 2), c(4, 5), c(5, 6), c(7, 5)))
+
+#We will be interested in the set B of all nodes that are d-connected to A={1} by the set C={3,6}
+Sets <- list("A" = c(1), "C" = c(3, 6))
+
+#Now the function reach() is used to detect all nodes d-connected to the node 1 by the set {3,6}:
+reach(G, Sets, d_Connected_path)
+```
+
+And we can also do it in Python. 
+```{python}
+import ciflypy as cf
+
+#We call the rule table from the .txt file
+d_Connection_path = "./d_connection_rule_table.txt"
+
+#The DAG is stored in a list as an edge list matrix labeled by the edge type "-->"
+G = {"-->": [(1, 2), (2, 3), (4, 2), (4, 5), (5, 6), (7, 5)]}
+
+#We will be interested in the set B of all nodes that are d-connected to A={1} by the set C={3,6}
+sets = {"A": [1], "C": [3, 6]}
+
+#Now the function reach() is used to detect all nodes d-connected to the node 1 by the set {3,6}:
+cf.reach(G, sets, dsep_table_path)
 ```
