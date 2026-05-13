@@ -15,7 +15,7 @@ pip install ciflypy
 For Python the installation should not require any further dependencies. For R, the [Rust](https://rustup.rs/) toolchain must be installed if the package is build on your system, which is the case of Linux distributions.
 
 ## Example with d-separation 
-Now show how to detect d-separation with CIfly in R and Python. The CIfly algorithm specified by the following rule table (saved in the file dsep.txt) returns all nodes d-connected to set X given set Z.
+Now show how to detect d-separation with CIfly in R and Python. The CIfly algorithm specified by the following rule table (saved in the file d_connection_rule_table.txt) returns all nodes d-connected to set A by a set C.
 ```{r}
 EDGES --> <--
 SETS A, C
