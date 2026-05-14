@@ -1,5 +1,5 @@
 # Title: Analysis of time-complexity for sigma-separation cifly-based algorithms. 
-# Date: May 14 2026
+# Date: May 7 2026
 
 #This file includes code to show how to compute d-separation using the function reach() of the ciflyr package.
 #The following libraries can be downloaded from the CRAN Package Repository:
@@ -272,7 +272,6 @@ M2 <- as.integer(0.6 * P)
 Time_sigma.sep_sparse <- rep(0, length(P))
 
 for (i in 1:length(P)){
-  
   #G_edges <- generate_directed_graph_matrix(P[i], M[i])
   DMG <- generate_DMG(P[i], M1[i], M2[i])
   
@@ -295,14 +294,17 @@ for (i in 1:length(P)){
   
   XUZ <- sample(V, n1, replace = FALSE)
   
-  SetsL <- c(list("X" = XUZ[1:n2], "Z" = XUZ[(n2 + 1):n1]), C)
+  sigma_Connect <- sigma_table_mixed_graphs(q)
+  sigma_Connect <- parseRuletable(sigma_Connect, tableAsString = TRUE)
   
-  sigmaConnect1 <- sigma_table_mixed_graphs(q)
+  SetsL <- c(list("X" = XUZ[1:n2], "Z" = XUZ[(n2 + 1):n1]), C)
+  SetsL <- parseSets(SetsL, sigma_Connect)
   
   #G_cyclic <- list("-->"=G_edges)
   DMG_list <- list("-->" = DMG$directed, "<->" = DMG$bidirected)
+  DMG_parsed <- parseGraph(DMG_list, sigma_Connect)
   
-  t <- system.time(reach(G_cyclic,SetsL, sigmaConnect1, tableAsString = TRUE ))
+  t <- system.time(reach(DMG_parsed, SetsL, sigma_Connect))
   cpu_time <- t["user.self"] + t["sys.self"]
   #time_sim.1[j] <- cpu_time
   
@@ -335,7 +337,6 @@ M2 <- as.integer(0.6 * 0.2 * P * (P - 1))
 Time_sigma.sep_dense <- rep(0, length(P))
 
 for (i in 1:length(P)){
-  
   #G_edges <- generate_directed_graph_matrix(P[i], M[i])
   DMG <- generate_DMG(P[i], M1[i], M2[i])
   
@@ -358,14 +359,17 @@ for (i in 1:length(P)){
   
   XUZ <- sample(V, n1, replace = FALSE)
   
-  SetsL <- c(list("X" = XUZ[1:n2], "Z" = XUZ[(n2 + 1):n1]), C)
+  sigma_Connect <- sigma_table_mixed_graphs(q)
+  sigma_Connect <- parseRuletable(sigma_Connect, tableAsString = TRUE)
   
-  sigmaConnect1 <- sigma_table_mixed_graphs(q)
+  SetsL <- c(list("X" = XUZ[1:n2], "Z" = XUZ[(n2 + 1):n1]), C)
+  SetsL <- parseSets(SetsL, sigma_Connect)
   
   #G_cyclic <- list("-->"=G_edges)
   DMG_list <- list("-->" = DMG$directed, "<->" = DMG$bidirected)
+  DMG_parsed <- parseGraph(DMG_list, sigma_Connect)
   
-  t <- system.time(reach(G_cyclic,SetsL, sigmaConnect1, tableAsString = TRUE ))
+  t <- system.time(reach(DMG_parsed, SetsL, sigma_Connect))
   cpu_time <- t["user.self"] + t["sys.self"]
   #time_sim.1[j] <- cpu_time
   
@@ -382,3 +386,35 @@ plot_sigma_sep_dense <- ggplot() +
 
 #Simple plot
 plot(P,Time_sigma.sep_dense,type = "b")
+
+
+
+
+#The following function computes the SCC of a graph G and also writes the corresponding 
+#required table
+SCC_and_ruletable = function(G,X,Z){
+  G_directed_edges=G$direceted
+  
+  G1=graph_from_edgelist(G_direceted_edges, directed = TRUE)
+  
+  SCC_G=components(G1, mode = "strong")
+  
+  #We need this number for writing the rule table.
+  q=SCC_G1$no
+  
+  #These are the SCC for the input L (introduced as "Sets")
+  C = split(V(G1), SCC_G1$membership)
+  
+  SCC_and_table$'sigma_table'=sigma_table_mixed_graphs2(2)
+  
+  SCC_and_ruletable$'C'= C
+  
+  return(SCC_and_ruletable)
+}
+
+
+
+
+
+
+
