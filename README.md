@@ -1,5 +1,5 @@
 # Algorithmics for Separation Criteria 
-The CIfly algorithmic framework (see this [paper](https://doi.org/10.48550/arXiv.2506.15758) by Wienöobst et al., 2025) has been proposed to solve wide variety of causal inference tasks. This article focuses on how to use CIfly for the creation of algorithms to detect graphical separation patterns for different criteria. The CIfly framework is available for R as <tt>ciflyr</tt>, and for Python as <tt>ciflypy</tt>.  
+Problems involving detection of conditional independence patterns can be solved by algorithms based on modular variations of graph reachability applied to direceted graphs built via instructions provided in rule tables. The CIfly framework (see this [paper](https://doi.org/10.48550/arXiv.2506.15758) by Wienöbst et al., 2025) has been proposed for developing reachability-based algorithms to solve a variety of causal inference tasks. We rely on CIfly, available for R as <tt>ciflyr</tt>, and for Python as <tt>ciflypy</tt>, for the creation of algorithms to detect graphical separation patterns in different types of probabilistic graphical models. 
 
 ## Installation
 CIfly can be installed via CRAN in R
@@ -15,7 +15,7 @@ pip install ciflypy
 For Python the installation should not require any further dependencies. For R, the [Rust](https://rustup.rs/) toolchain must be installed if the package is build on your system, which is the case of Linux distributions.
 
 ## Example with d-separation 
-Now, we show how to detect d-separation with CIfly in R and Python. The CIfly-based algorithm corresponding to the following rule table (saved as <tt>d_connection_rule_table.txt</tt>) returns the set of all nodes $d$-connected to set $A$ by a set $C$. The rule table can be embedded into the code as a string or loaded via file path such as a .txt file. 
+We show how to solve d-separation with in R and Python. The algorithm corresponding to the following rule table (saved as <tt>d_connection_rule_table.txt</tt>) returns the set of all nodes $d$-connected to set $A$ by a set $C$. The rule table can be embedded into the code as a string or loaded via file path such as a .txt file. 
 ```r
 EDGES --> <--
 SETS A, C
