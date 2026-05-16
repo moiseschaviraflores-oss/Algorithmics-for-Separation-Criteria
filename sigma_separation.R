@@ -257,6 +257,178 @@ generate_DMG <- function(p, m1, m2) {
 }
 
 
+# This function generates DMGs for a given size p + m_1 + m_2 with a given number q of SCC 
+generate_DMG_qSCC <- function(p, m1, m2, q) {
+if (q > p) {
+  stop("q cannot exceed p.")
+}
+
+max_pairs <- choose(p, 2)
+
+if (m1 + m2 > max_pairs) {
+  stop("Too many edges requested.")
+}
+
+## -------------------------------------------------
+## Step 1: Partition nodes into q SCCs
+## -------------------------------------------------
+
+nodes <- sample(1:p)
+
+# Random partition sizes
+sizes <- rep(1, q)
+
+remaining <- p - q
+
+if (remaining > 0) {
+  extra <- sample(1:q, remaining, replace = TRUE)
+  for (i in extra) {
+    sizes[i] <- sizes[i] + 1
+  }
+}
+
+SCCs <- list()
+
+idx <- 1
+
+for (i in 1:q) {
+  SCCs[[i]] <- nodes[idx:(idx + sizes[i] - 1)]
+  idx <- idx + sizes[i]
+}
+
+## -------------------------------------------------
+## Step 2: Create directed edges ensuring SCCs
+## -------------------------------------------------
+
+dir_edges <- matrix(ncol = 2, nrow = 0)
+
+used_pairs <- list()
+
+pair_key <- function(a, b) {
+  paste(sort(c(a, b)), collapse = "-")
+}
+
+## Create one directed cycle inside each SCC
+for (C in SCCs) {
+  
+  if (length(C) >= 2) {
+    
+    for (i in 1:(length(C)-1)) {
+      dir_edges <- rbind(dir_edges, c(C[i], C[i+1]))
+      used_pairs[[pair_key(C[i], C[i+1])]] <- TRUE
+    }
+    
+    dir_edges <- rbind(dir_edges, c(C[length(C)], C[1]))
+    used_pairs[[pair_key(C[length(C)], C[1])]] <- TRUE
+  }
+}
+
+## -------------------------------------------------
+## Step 3: Add extra directed edges without merging SCCs
+## -------------------------------------------------
+
+current_m1 <- nrow(dir_edges)
+
+possible_dir <- matrix(ncol = 2, nrow = 0)
+
+for (i in 1:q) {
+  
+  Ci <- SCCs[[i]]
+  
+  ## Internal edges
+  for (u in Ci) {
+    for (v in Ci) {
+      if (u != v) {
+        
+        key <- pair_key(u, v)
+        
+        if (is.null(used_pairs[[key]])) {
+          possible_dir <- rbind(possible_dir, c(u, v))
+        }
+      }
+    }
+  }
+  
+  ## Between SCCs: only forward direction
+  if (i < q) {
+    
+    for (j in (i+1):q) {
+      
+      Cj <- SCCs[[j]]
+      
+      for (u in Ci) {
+        for (v in Cj) {
+          
+          key <- pair_key(u, v)
+          
+          if (is.null(used_pairs[[key]])) {
+            possible_dir <- rbind(possible_dir, c(u, v))
+          }
+        }
+      }
+    }
+  }
+}
+
+needed <- m1 - current_m1
+
+if (needed < 0) {
+  stop("m1 too small to realize q SCCs.")
+}
+
+if (needed > nrow(possible_dir)) {
+  stop("Not enough possible directed edges.")
+}
+
+if (needed > 0) {
+  
+  extra_idx <- sample(nrow(possible_dir), needed)
+  
+  extra_dir <- possible_dir[extra_idx, , drop = FALSE]
+  
+  dir_edges <- rbind(dir_edges, extra_dir)
+  
+  for (k in 1:nrow(extra_dir)) {
+    used_pairs[[pair_key(extra_dir[k,1], extra_dir[k,2])]] <- TRUE
+  }
+}
+
+colnames(dir_edges) <- c("from", "to")
+
+## -------------------------------------------------
+## Step 4: Add bidirected edges
+## -------------------------------------------------
+
+all_pairs <- t(combn(1:p, 2))
+
+keep <- apply(all_pairs, 1, function(pair) {
+  is.null(used_pairs[[pair_key(pair[1], pair[2])]])
+})
+
+possible_bidir <- all_pairs[keep, , drop = FALSE]
+
+if (m2 > nrow(possible_bidir)) {
+  stop("Not enough remaining pairs for bidirected edges.")
+}
+
+bidir_edges <- possible_bidir[
+  sample(nrow(possible_bidir), m2),
+  ,
+  drop = FALSE
+]
+
+colnames(bidir_edges) <- c("node1", "node2")
+
+## -------------------------------------------------
+## Output
+## -------------------------------------------------
+
+DMG <- list("directed" = dir_edges, "bidirected" = bidir_edges, "SCCs" = SCCs)
+
+return(DMG)
+}
+
+
 ######## Complexity Analysis: 
 #To verify how the execution time increases as the size a a graph increases, we generate random DMGs
 #for different numbers p. 
