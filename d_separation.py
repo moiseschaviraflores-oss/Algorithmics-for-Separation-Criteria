@@ -42,7 +42,8 @@ ig.plot(DAG, target = ax,
     edge_width=0.5,
     edge_color="black",
     edge_size=2.5,
-    edge_arrow_size=0.35
+    edge_arrow_size = 10,
+    edge_arrow_width = 10 
 )
 
 # For the DAG above, the set of nodes d-connected to A given C is B = {1, 2, 3, 4, 5, 6, 7} (not necessarily disjoint to A and C).
