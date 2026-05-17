@@ -3,39 +3,13 @@
 # Authors: Moisés Chavira Flores, Sebastian Weichwald, Leonard Henckel
 
 #This file includes code to show how to compute d-separation using the function reach() of the ciflyr package.
+
 #The following libraries can be downloaded from the CRAN Package Repository:
 library(ciflyr)
 library(here)
 library(igraph)
 library(latex2exp)
 library(ggplot2)
-
-#The function reach() requires the following input arguments:
-#1. "graph" a list which for each type of edges includes a 2-columns matrix of edges; 
-#2. "sets" a list representing sequence of sets of nodes stored as vectors;
-#3. "ruletable" can be a .txt file or a written string; 
-#and two logical arguments: 
-#4. "tableAsString" which must be TRUE if the "tablerule" is provided as a string.
-#5. "verbose" which controls the printing of messages provided by "reach()".
-
-
-# Example: DAG as a list of (directed) edges in a 2-columns matrix
-DAG_edges <- rbind(c(1, 2), c(2, 3), c(4, 2), c(4, 5), c(5, 6), c(7, 5))
-
-# Create a graph object:
-DAG <- graph_from_edgelist(DAG_edges)
-
-# Plot the graph:
-plot(DAG,
-     vertex.color = "#6699cc", # Node color
-     vertex.size = 22, # Node size
-     vertex.label.size = 14 , # Label size
-     vertex.label.color = "black", # Label color
-     edge.color = "black", # Edge color
-     edge.width = 0.5, # Edge width
-     edge.arrow.size = 0.35,
-     edge.size = 2.5)
-
 
 #The following string is the rule table for finding d-connected nodes to a set A by a set C:
 d_connected_table <- "
@@ -49,54 +23,70 @@ OUTPUT ...
 <-- | --> | current not in C
 <-- | <-- | current not in C
 "
-#We parse the ruletable such that "reach()" does not need addtional to pre-process it. 
-d_connected_table <- parseRuletable(d_connected_table, tableAsString = TRUE)
 
-#The DAG in the picture is stored in the format required by reach() as follows:
-G <- list("-->" = G_edges)
+# Example: DAG as a list of (directed) edges in a 2-columns matrix
+DAG_edges <- rbind(c(1, 2), c(2, 3), c(4, 2), c(4, 5), c(5, 6), c(7, 5))
 
-#We parse the graph such that "reach()" does not need additional to pre-process
-G <- parseGraph(G, d_connected_table)
+# Create a igraph object:
+DAG <- graph_from_edgelist(DAG_edges)
 
-#We will be interested in the set B of all nodes that are d-connected to A={1} by the set C={3,6}
-Sets <- list("A" = c(1), "C" = c(3, 6))
-Sets <- parseSets(Sets, d_connected_table)
+# Plot the graph:
+plot(DAG,
+     vertex.color = "#6699cc", # Node color
+     vertex.size = 22, # Node size
+     vertex.label.size = 14 , # Label size
+     vertex.label.color = "black", # Label color
+     edge.color = "black", # Edge color
+     edge.width = 0.5, # Edge width
+     edge.arrow.size = 0.35,
+     edge.size = 2.5)
 
-#Now the function reach() is used to detect all nodes d-connected to the node 1 by the set {3,6}:
-reach(G, Sets, d_connected_table, tableAsString=TRUE)
-
-#True set
+# For the DAG above, the set of nodes d-connected to A = {1} given C = {3, 6} is B = {1, 2, 3, 4, 5, 6, 7} (not necessarily disjoint to A and C).
 B_true <- c(1, 2, 3, 4, 5, 6, 7)
 
-
-# The following function requires a rule table as string.
+# Write a function to solve d-connection. 
+# It requires a rule table as string.
 # It offers the possibility of computing a disjoint set form A and C (not disjoint by default).   
 d_connected_with_string <- function(G, A, C, d_connected_table, disjoint = FALSE){
-  # Store A and C in a list
   Sets <- list("A" = A, "C" = C)
-  
-  #Compute the set B of all nodes d_connected 
   B <- reach(G, Sets, d_connected_table, tableAsString = TRUE)
-  
-  #If disjoint == TRUE, then A, B and C must be disjoint
   if(disjoint == TRUE){B <- setdiff(B, c(A, C))}
+  return(sort(B))
+}
+
+# The DAG in the plot is stored as required by "reach".
+G <- list("-->" = DAG_edges)
+
+# required sets.
+A <- c(1)
+C <- c(3, 6)
+
+# Compute the set B
+B <- d_connected_with_string(G, A, C, d_connected_table)
+print(B)
+
+# We test
+B == B_true
+
+# If we ask A, B and C to be disjoint we must get B_disj = {2, 4, 5, 7}
+B_disj <- d_connected_with_string(G, A, C, d_connected_table, disjoint = TRUE)
+print(B_disj)
+
+# Write a function to solve d-connection.
+# This function requires to specify path to rule table: 
+d_connected_with_txt(G, A, C){
+  # Sets
+  sets = list("A" = A, "C" = C)
+  
+  # Path to table
+  table_path = "./d_connected_rule_table.txt"
+  
+  # Compute the set B of all nodes d_connected 
+  B = reach(G, sets, table_path)
   
   #Return nodes by order of labels
   return(sort(B))
 }
-
-# This provides 1, 2, 3, 4, 5, 6, 7
-A <- c(1)
-C <- c(3, 6)
-B <- d_connected_with_string(G, A, C, d_connected_table)
-print(B)
-
-#We test
-B == B_true
-
-# If we ask A, B and C to be disjoint we must get 2, 4, 5, 7
-B_disj <- d_connected_with_string(G, A, C, d_connected_table, disjoint = TRUE)
-print(B_disj)
 
 
 ##### This is the Time-Complexity Analysis ####
