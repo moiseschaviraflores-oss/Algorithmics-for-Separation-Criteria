@@ -74,7 +74,7 @@ print(B_disj)
 
 # Write a function to solve d-connection.
 # This function requires to specify path to rule table: 
-d_connected_with_txt(G, A, C){
+d_connected_with_txt <- function(G, A, C){
   # Sets
   sets = list("A" = A, "C" = C)
   
