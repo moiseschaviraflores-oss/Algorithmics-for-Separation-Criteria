@@ -2,10 +2,14 @@
 # Date: 17 May 2026
 # Authors: Moisés Chavira Flores, Sebastian Weichwald, Leonard Henckel
 
+# This file includes code to solve the problem of finding the set B of all nodes d-connected to A given C.
+
+# The following modules can be installed via pip in Python:
 import ciflypy as cf
 import igraph as ig
 import matplotlib.pyplot as plt
 
+#The following string is the rule table for finding d-connected nodes to a set A by a set C:
 d_connected_table = """
 EDGES --> <--
 SETS A, C
@@ -18,7 +22,7 @@ OUTPUT ...
 <-- | <-- | current not in C
 """
 
-# Example: DAG as a list of (directed) edges in a 2-columns matrix
+# Example: A directed acyclic graph (DAG) as a list of edges in a 2-columns matrix
 n_nodes = 7
 DAG_edges = [(1, 2), (2, 3), (4, 2), (4, 5), (5, 6), (7, 5)]
 
@@ -41,7 +45,11 @@ ig.plot(DAG, target = ax,
     edge_arrow_size=0.35
 )
 
-# The following function requires a rule table as string to solve d-separation: 
+# For the DAG above, the set of nodes d-connected to A given C is B = {1, 2, 3, 4, 5, 6, 7} (not necessarily disjoint to A and C).
+B_true = [1, 2, 3, 4, 5, 6, 7]
+
+# Write a function to solve d-connection.
+# This function requires a rule table as string: 
 def d_connected_with_string(G, A, C, d_connected_table):
     sets = {"A": A, "C": C}
     B = cf.reach(G, sets, d_connected_table, table_as_string = True)
@@ -51,7 +59,20 @@ def d_connected_with_string(G, A, C, d_connected_table):
 G = {"-->": DAG_edges}
 
 #Sets
-A=[1]
-C=[3, 6]
+A = [1]
+C = [3, 6]
 
-d_connected_with_string(G, A, C, d_connected_table)
+# Compute the set B
+B = d_connected_with_string(G, A, C, d_connected_table)
+print(B)
+
+#Test
+B == B_true
+
+# Write a function to solve d-connection.
+# This function requires to specify path to rule table: 
+def d_connected_with_txt(G, A, C):
+    sets = {"A": A, "C": C}
+    table_path = "./d_connected_rule_table.txt"
+    B = cf.reach(G, sets, table_path)
+    return sorted(B)
