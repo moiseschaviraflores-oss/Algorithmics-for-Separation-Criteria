@@ -55,10 +55,10 @@ def d_connected_with_string(G, A, C, d_connected_table):
     B = cf.reach(G, sets, d_connected_table, table_as_string = True)
     return sorted(B)
 
-#Our graph
+# The DAG as required by the function. 
 G = {"-->": DAG_edges}
 
-#Sets
+# Sets
 A = [1]
 C = [3, 6]
 
