@@ -1,5 +1,6 @@
-# Title: Analysis of time-complexity for d-separation algorithms using the ciflyr package. 
-# Date: May 7 2026
+# Title: Algorithm to solve d-separation in R. 
+# Date: 17 May 2026
+# Authors: Moisés Chavira Flores, Sebastian Weichwald, Leonard Henckel
 
 #This file includes code to show how to compute d-separation using the function reach() of the ciflyr package.
 #The following libraries can be downloaded from the CRAN Package Repository:
@@ -18,18 +19,11 @@ library(ggplot2)
 #5. "verbose" which controls the printing of messages provided by "reach()".
 
 
-#TOY EXAMPLE:
-#Consider the DAG with adjacency matrix: 
-Adj <- matrix(c(0, 1, 0, 0, 0, 0, 0,
-                0, 0, 1, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0,
-                0, 1, 0, 0, 1, 0, 0,
-                0, 0, 0, 0, 0, 1, 0,
-                0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 1, 0, 0), nrow = 7, byrow = TRUE)
+# Example: DAG as a list of (directed) edges in a 2-columns matrix
+DAG_edges <- rbind(c(1, 2), c(2, 3), c(4, 2), c(4, 5), c(5, 6), c(7, 5))
 
 # Create a graph object:
-DAG <- graph_from_adjacency_matrix(Adj)
+DAG <- graph_from_edgelist(DAG_edges)
 
 # Plot the graph:
 plot(DAG,
@@ -59,17 +53,21 @@ OUTPUT ...
 d_connected_table <- parseRuletable(d_connected_table, tableAsString = TRUE)
 
 #The DAG in the picture is stored in the format required by reach() as follows:
-G <- list("-->" = rbind(c(1, 2), c(2, 3), c(4, 2), c(4, 5), c(5, 6), c(7, 5)))
+G <- list("-->" = G_edges)
 
-#We parse the graph such that "reach()" does not need addtional to pre-process
+#We parse the graph such that "reach()" does not need additional to pre-process
 G <- parseGraph(G, d_connected_table)
 
 #We will be interested in the set B of all nodes that are d-connected to A={1} by the set C={3,6}
 Sets <- list("A" = c(1), "C" = c(3, 6))
 Sets <- parseSets(Sets, d_connected_table)
 
-# If we do not care about output set to be disjoint, it must be
+#Now the function reach() is used to detect all nodes d-connected to the node 1 by the set {3,6}:
+reach(G, Sets, d_connected_table, tableAsString=TRUE)
+
+#True set
 B_true <- c(1, 2, 3, 4, 5, 6, 7)
+
 
 # The following function requires a rule table as string.
 # It offers the possibility of computing a disjoint set form A and C (not disjoint by default).   
@@ -99,25 +97,6 @@ B == B_true
 # If we ask A, B and C to be disjoint we must get 2, 4, 5, 7
 B_disj <- d_connected_with_string(G, A, C, d_connected_table, disjoint = TRUE)
 print(B_disj)
-
-
-# A similar function could be writen if the rule table is provided as a .txt file. 
-d_connected_with_path <- function(G, A, C, disjoint = FALSE){
-  # Path to rule table
-  tablePath <- "./d_connection_rule_table.txt"
-  
-  # Store A and C in a list
-  Sets <- list("A" = A, "C" = C)
-  
-  #Compute the set B of all nodes d_connected 
-  B <- reach(G, Sets, tablePath)
-  
-  #If disjoint == TRUE, then A, B and C must be disjoint
-  if(disjoint == TRUE){B <- setdiff(B, c(A, C))}
-  
-  #Return nodes by order of labels
-  return(sort(B))
-}
 
 
 ##### This is the Time-Complexity Analysis ####
