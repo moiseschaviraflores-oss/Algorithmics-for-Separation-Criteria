@@ -68,9 +68,8 @@ G <- parseGraph(G, d_connected_table)
 Sets <- list("A" = c(1), "C" = c(3, 6))
 Sets <- parseSets(Sets, d_connected_table)
 
-#Now the function reach() is used to detect all nodes d-connected to the node 1 by the set {3,6}:
-reach(G, Sets, d_connected_table, tableAsString=TRUE)
-
+# If we do not care about output set to be disjoint, it must be
+B_true <- c(1, 2, 3, 4, 5, 6, 7)
 
 # The following function requires a rule table as string.
 # It offers the possibility of computing a disjoint set form A and C (not disjoint by default).   
@@ -93,6 +92,9 @@ A <- c(1)
 C <- c(3, 6)
 B <- d_connected_with_string(G, A, C, d_connected_table)
 print(B)
+
+#We test
+B == B_true
 
 # If we ask A, B and C to be disjoint we must get 2, 4, 5, 7
 B_disj <- d_connected_with_string(G, A, C, d_connected_table, disjoint = TRUE)
