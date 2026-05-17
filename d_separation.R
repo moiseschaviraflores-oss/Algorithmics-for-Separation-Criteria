@@ -44,7 +44,7 @@ plot(DAG,
 
 
 #The following string is the rule table for finding d-connected nodes to a set A by a set C:
-dConnected <- "
+d_connected_table <- "
 EDGES --> <--
 SETS A, C
 START <-- AT A
@@ -55,21 +55,71 @@ OUTPUT ...
 <-- | --> | current not in C
 <-- | <-- | current not in C
 "
-#We parse the ruletable "dConnected" such that "reach()" does not need addtional to pre-process it. 
-dConnected <- parseRuletable(dConnected, tableAsString = TRUE)
+#We parse the ruletable such that "reach()" does not need addtional to pre-process it. 
+d_connected_table <- parseRuletable(d_connected_table, tableAsString = TRUE)
 
 #The DAG in the picture is stored in the format required by reach() as follows:
 G <- list("-->" = rbind(c(1, 2), c(2, 3), c(4, 2), c(4, 5), c(5, 6), c(7, 5)))
 
 #We parse the graph such that "reach()" does not need addtional to pre-process
-G <- parseGraph(G, dConnected)
+G <- parseGraph(G, d_connected_table)
 
 #We will be interested in the set B of all nodes that are d-connected to A={1} by the set C={3,6}
 Sets <- list("A" = c(1), "C" = c(3, 6))
-Sets <- parseSets(Sets, dConnected)
+Sets <- parseSets(Sets, d_connected_table)
 
 #Now the function reach() is used to detect all nodes d-connected to the node 1 by the set {3,6}:
-reach(G, Sets, dConnected, tableAsString=TRUE)
+reach(G, Sets, d_connected_table, tableAsString=TRUE)
+
+
+# The following function requires a rule table as string.
+# It offers the possibility of computing a disjoint set form A and C (not disjoint by default).   
+d_connected_with_string <- function(G, A, C, d_connected_table, disjoint = FALSE){
+  # Store A and C in a list
+  Sets <- list("A" = A, "C" = C)
+  
+  #Compute the set B of all nodes d_connected 
+  B <- reach(G, Sets, d_connected_table, tableAsString = TRUE)
+  
+  #If disjoint == TRUE, then A, B and C must be disjoint
+  if(disjoint == TRUE){B <- setdiff(B, c(A, C))}
+  
+  #Return nodes by order of labels
+  return(sort(B))
+}
+
+# This provides 1, 2, 3, 4, 5, 6, 7
+A <- c(1)
+C <- c(3, 6)
+B <- d_connected_with_string(G, A, C, d_connected_table)
+print(B)
+
+# If we ask A, B and C to be disjoint we must get 2, 4, 5, 7
+B_disj <- d_connected_with_string(G, A, C, d_connected_table, disjoint = TRUE)
+print(B_disj)
+
+
+# A similar function could be writen if the rule table is provided as a .txt file. 
+d_connected_with_path <- function(G, A, C, disjoint = FALSE){
+  # Path to rule table
+  tablePath <- "./d_connection_rule_table.txt"
+  
+  # Store A and C in a list
+  Sets <- list("A" = A, "C" = C)
+  
+  #Compute the set B of all nodes d_connected 
+  B <- reach(G, Sets, tablePath)
+  
+  #If disjoint == TRUE, then A, B and C must be disjoint
+  if(disjoint == TRUE){B <- setdiff(B, c(A, C))}
+  
+  #Return nodes by order of labels
+  return(sort(B))
+}
+
+
+##### This is the Time-Complexity Analysis ####
+# It belongs to a nother script and should be ignored for now. 
 
 #We can perform a empirical complexity analysis to verify whether the execution time for the task of
 #computing the set B increases at linear rate with respect to the size p+m of the input graph G, where
