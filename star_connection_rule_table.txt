@@ -2,7 +2,7 @@ EDGES --> <--
 SETS A, C
 COLORS before, after
 START <-- [before] AT A
-OUTPUT ... [after]
+OUTPUT ... [...]
 
 --> [before] | <-- [after]  | current in C
 --> [before] | --> [before] | current not in C
