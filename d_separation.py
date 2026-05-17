@@ -1,3 +1,7 @@
+# Title: Algorithm to solve d-separation in Python. 
+# Date: 17 May 2026
+# Authors: Moisés Chavira Flores, Sebastian Weichwald, Leonard Henckel
+
 import ciflypy as cf
 import igraph as ig
 import matplotlib.pyplot as plt
