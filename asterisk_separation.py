@@ -78,7 +78,7 @@ B == B_true
 # This function requires to specify path to rule table: 
 def asterist_connected_with_txt(G, A, C):
     sets = {"A": A, "C": C}
-    table_path = "./star_connected_rule_table.txt"
+    table_path = "./asterisk_connection_rule_table.txt"
     B = cf.reach(G, sets, table_path)
     return sorted(B)
 
