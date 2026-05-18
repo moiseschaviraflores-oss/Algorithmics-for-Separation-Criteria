@@ -80,7 +80,7 @@ print(B_disj)
 # This function requires to specify path to rule table: 
 asterisk_connected_with_txt <- function(G, A, C){
   sets = list("A" = A, "C" = C)
-  table_path = "./star_connected_rule_table.txt"
+  table_path = "./asterisk_connection_rule_table.txt"
   B = reach(G, sets, table_path)
   return(sort(B))
 }
