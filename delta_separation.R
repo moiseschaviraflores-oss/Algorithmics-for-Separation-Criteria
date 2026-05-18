@@ -74,7 +74,7 @@ B == B_true
 B_disj <- delta_connected_with_string(G, A, C, delta_connected_table, disjoint = TRUE)
 print(B_disj)
 
-# Write a function to solve d-connection.
+# Write a function to solve delta-connection.
 # This function requires to specify path to rule table: 
 delta_connected_with_txt <- function(G, A, C){
   # Sets
