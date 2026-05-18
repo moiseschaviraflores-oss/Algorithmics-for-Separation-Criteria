@@ -43,7 +43,7 @@ plot(DG,
      edge.arrow.size = 0.35,
      edge.size = 2.5)
 
-# For the DAG above, the set of nodes d-connected to A = {1} given C = {3, 6} is B = {2, 3, 4, 5, 6}.
+# For the DG above, the set of nodes delta-connected to A = {1} given C = {3, 6} is B = {2, 3, 4, 5, 6}.
 B_true <- c(2, 3, 4, 5, 6)
 
 # Write a function to solve delta-connection. 
