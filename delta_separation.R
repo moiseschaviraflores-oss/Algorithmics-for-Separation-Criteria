@@ -89,3 +89,4 @@ delta_connected_with_txt <- function(G, A, C){
   #Return nodes by order of labels
   return(sort(B))
 }
+
