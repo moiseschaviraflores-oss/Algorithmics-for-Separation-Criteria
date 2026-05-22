@@ -1,6 +1,14 @@
 ###################################################################################################################
 ############Time-Complexity Analysis for sigma-separation   ###################
 
+# The following libraries can be downloaded from the CRAN Package Repository:
+library(ciflyr)
+library(here)
+library(igraph)
+library(latex2exp)
+library(ggplot2)
+library(scales)
+
 # The following function produces directed mixed graphs (DMGs) for given p and m and q.
 # The argument p is the number of nodes, m is the number of edges, and q is the number of strongly connected components.  
 # It returns two lists of edges in a 2-column matrix.
