@@ -1,8 +1,0 @@
-EDGES --> <--
-SETS A, C_A, C_B
-START <-- AT A
-OUTPUT ...
-
-<--  | <--  | current not in C_A
--->  | -->  | current not in C_B
-<--  | -->  | current not in C_A and current not in C_B
