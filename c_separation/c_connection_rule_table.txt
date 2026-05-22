@@ -1,0 +1,9 @@
+EDGES --> <--
+SETS A, C
+START <-- AT A
+OUTPUT ...
+
+--> | <-- | current not in C
+--> | --> | true
+<-- | <-- | true
+<-- | --> | true
