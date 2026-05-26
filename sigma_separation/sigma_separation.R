@@ -71,16 +71,16 @@ sigma_table_mixed_graphs <- function(q){
     paste("<-> [plain]    | <-- [formereq] |", rule4), 
     paste("--> [plain]    | <-> [plain]    |", rule5), 
     paste("<-> [plain]    | <-> [plain]    |", rule6), 
-    paste("--> [plain]    | --> [plain] |", rule7), 
-    paste("<-> [plain]    | --> [plain] |", rule8), 
+    paste("--> [plain]    | --> [plain]    |", rule7), 
+    paste("<-> [plain]    | --> [plain]    |", rule8), 
     paste("<-- [outZ]     | <-- [formereq] |", rule9), 
     paste("<-- [outZ]     | <-- [outZ]     |", rule10), 
     paste("<-- [formereq] | <-- [formereq] |", rule11), 
     paste("<-- [formereq] | <-- [outZ]     |", rule12), 
     paste("<-- [outZ]     | <-> [plain]    |", rule13), 
     paste("<-- [formereq] | <-> [plain]    |", rule14), 
-    paste("<-- [outZ]     | --> [plain] |", rule15), 
-    paste("<-- [formereq] | --> [plain] |", rule16), 
+    paste("<-- [outZ]     | --> [plain]    |", rule15), 
+    paste("<-- [formereq] | --> [plain]    |", rule16), 
     sep = "\n")
   
   # We ask to return table
