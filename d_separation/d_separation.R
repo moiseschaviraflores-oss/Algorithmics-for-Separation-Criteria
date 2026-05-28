@@ -79,7 +79,7 @@ d_connected_with_txt <- function(G, A, C){
   sets = list("A" = A, "C" = C)
   
   # Path to table
-  table_path = "./d_connected_rule_table.txt"
+  table_path = "./d_connection_rule_table.txt"
   
   # Compute the set B of all nodes d_connected 
   B = reach(G, sets, table_path)
