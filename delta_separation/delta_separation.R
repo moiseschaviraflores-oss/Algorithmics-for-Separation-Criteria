@@ -12,16 +12,16 @@ library(latex2exp)
 library(ggplot2)
 
 #The following string is the rule table for finding delta-connected nodes to a set A by a set C:
-delta_connected_table <- "
+delta_rule_table <-"
 EDGES --> <--
-SETS A, C
-START <-- AT A
-OUTPUT --> 
+SETS B, C
+START <-- AT B
+OUTPUT ...
 
---> | <-- | current in C
---> | --> | current not in C
-<-- | --> | current not in C
-<-- | <-- | current not in C
+-->  | <--  | current in C
+-->  | -->  | current not in B and current not in C
+<--  | -->  | current not in C
+<--  | <--  | current not in B and current not in C
 "
 
 # Example: DG as a list of (directed) edges in a 2-columns matrix
