@@ -10,7 +10,7 @@ import igraph as ig
 import matplotlib.pyplot as plt
 
 #The following string is the rule table for finding *-connected nodes to a set A by a set C:
-asterisk_connected_table = """
+star_connected_table = """
 EDGES --> <--
 SETS A, C
 COLORS before, after
@@ -55,9 +55,9 @@ B_true = [1, 2, 3, 4, 5, 6]
 
 # Write a function to solve *-connection.
 # This function requires a rule table as string: 
-def asterisk_connected_with_string(G, A, C, asterisk_connected_table):
+def star_connected_with_string(G, A, C, star_connected_table):
     sets = {"A": A, "C": C}
-    B = cf.reach(G, sets, asterisk_connected_table, table_as_string = True)
+    B = cf.reach(G, sets, star_connected_table, table_as_string = True)
     return sorted(B)
 
 # The DAG as required by the function. 
@@ -68,7 +68,7 @@ A = [1]
 C = [3, 6]
 
 # Compute the set B
-B = asterisk_connected_with_string(G, A, C, asterisk_connected_table)
+B = star_connected_with_string(G, A, C, star_connected_table)
 print(B)
 
 #Test
@@ -76,9 +76,9 @@ B == B_true
 
 # Write a function to solve *-connection.
 # This function requires to specify path to rule table: 
-def asterist_connected_with_txt(G, A, C):
+def star_connected_with_txt(G, A, C):
     sets = {"A": A, "C": C}
-    table_path = "./asterisk_connection_rule_table.txt"
+    table_path = "./star_connection_rule_table.txt"
     B = cf.reach(G, sets, table_path)
     return sorted(B)
 
