@@ -12,7 +12,7 @@ library(latex2exp)
 library(ggplot2)
 
 #The following string is the rule table for finding *-connected nodes to a set A by a set C:
-asterisk_connected_table <- "
+star_connected_table <- "
 EDGES --> <--
 SETS A, C
 COLORS before, after
@@ -51,9 +51,9 @@ B_true <- c(1, 2, 3, 4, 5, 6)
 # Write a function to solve *-connection. 
 # It requires a rule table as string.
 # It offers the possibility of computing a disjoint set form A and C (not disjoint by default).   
-asterisk_connected_with_string <- function(G, A, C, asterisk_connected_table, disjoint = FALSE){
+star_connected_with_string <- function(G, A, C, star_connected_table, disjoint = FALSE){
   Sets <- list("A" = A, "C" = C)
-  B <- reach(G, Sets, asterisk_connected_table, tableAsString = TRUE)
+  B <- reach(G, Sets, star_connected_table, tableAsString = TRUE)
   if(disjoint == TRUE){B <- setdiff(B, c(A, C))}
   return(sort(B))
 }
@@ -66,21 +66,21 @@ A <- c(1)
 C <- c(3, 6)
 
 # Compute the set B
-B <- asterisk_connected_with_string(G, A, C, asterisk_connected_table)
+B <- star_connected_with_string(G, A, C, star_connected_table)
 print(B)
 
 # We test
 B == B_true
 
 # If we ask A, B and C to be disjoint we must get B_disj = {2, 4, 5}
-B_disj <- asterisk_connected_with_string(G, A, C, asterisk_connected_table, disjoint = TRUE)
+B_disj <- star_connected_with_string(G, A, C, star_connected_table, disjoint = TRUE)
 print(B_disj)
 
 # Write a function to solve *-connection.
 # This function requires to specify path to rule table: 
 asterisk_connected_with_txt <- function(G, A, C){
   sets = list("A" = A, "C" = C)
-  table_path = "./asterisk_connection_rule_table.txt"
+  table_path = "./star_connection_rule_table.txt"
   B = reach(G, sets, table_path)
   return(sort(B))
 }
