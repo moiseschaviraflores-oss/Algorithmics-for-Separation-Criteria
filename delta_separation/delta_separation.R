@@ -43,8 +43,8 @@ plot(DG,
      edge.arrow.size = 0.35,
      edge.size = 2.5)
 
-# For the DG above, the set of nodes delta-connected to B = {4, 6} given C = {2} is A = {1, 2, 4, 5, 6}.
-A_true <- c(1, 2, 4, 5, 6)
+# For the DG above, the set of nodes delta-connected to B = {4, 6} given C = {2} is A = {4, 5, 6, 7}.
+A_true <- c(4, 5, 6, 7)
 
 # Write a function to solve delta-connection. 
 # It requires a rule table as string.
@@ -70,7 +70,7 @@ print(A)
 # We test
 A == A_true
 
-# If we ask A, B and C to be disjoint we must get A_disj = {1, 5}
+# If we ask A, B and C to be disjoint we must get A_disj = {5, 7}
 A_disj <- delta_connected_with_string(G, B, C, delta_connected_table, disjoint = TRUE)
 print(A_disj)
 
@@ -89,4 +89,3 @@ delta_connected_with_txt <- function(G, B, C){
   #Return nodes by order of labels
   return(sort(A))
 }
-
