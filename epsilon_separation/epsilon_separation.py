@@ -12,19 +12,19 @@ import matplotlib.pyplot as plt
 #The following string is the rule table for finding epsilon-connected nodes to a set A by a set C:
 epsilon_connected_table = """
 EDGES --> <--
-SETS A, C
+SETS B, C
 COLORS before, after
-START <-- [before] AT A
-OUTPUT --> [...]
+START <-- [before] AT B
+OUTPUT ... [...]
 
 --> [before] | <-- [after]  | current in C
---> [after]  | <-- [after]  | current in C
-<-- [before] | <-- [before] | current not in C
+<-- [before] | <-- [before] | true
+<-- [before] | --> [before] | current not in B or current not in C
+--> [before] | --> [before] | current not in B or current not in C
+--> [after]  | <-- [after]  | current in C 
 <-- [after]  | <-- [after]  | current not in C
-<-- [before] | --> [before] | current not in C
-<-- [after]  | --> [after]  | current not in C
---> [before] | --> [before] | current not in C
---> [after]  | --> [after]  | true
+<-- [after]  | --> [after]  | current not in B or current not in C
+--> [after]  | --> [after]  | current not in B or current not in C
 """
 
 # Example: A directed graph (DG) as a list of edges in a 2-columns matrix
