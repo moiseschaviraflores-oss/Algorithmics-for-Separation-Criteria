@@ -2,7 +2,7 @@
 # Date: 17 May 2026
 # Authors: Moisés Chavira Flores, Sebastian Weichwald, Leonard Henckel
 
-# This file includes code to solve the problem of finding the set B of all nodes delta-connected to A given C.
+# This file includes code to solve the problem of finding the set A of all nodes delta-connected to B given C.
 
 # The following modules can be installed via pip in Python:
 import ciflypy as cf
@@ -46,37 +46,37 @@ ig.plot(DG, target = ax,
     edge_arrow_width = 10 
 )
 
-# For the DG above, the set of nodes delta-connected to A given C is B = {2, 3, 4, 5, 6}.
-B_true = [2, 3, 4, 5, 6]
+# For the DG above, the set of nodes delta-connected to B given C is A = {1, 2, 4, 5, 6}.
+B_true = [1, 2, 4, 5, 6]
 
 # Write a function to solve delta-connection.
 # This function requires a rule table as string: 
-def delta_connected_with_string(G, A, C, delta_connected_table):
-    sets = {"A": A, "C": C}
-    B = cf.reach(G, sets, delta_connected_table, table_as_string = True)
-    return sorted(B)
+def delta_connected_with_string(G, B, C, delta_connected_table):
+    sets = {"B": B, "C": C}
+    A = cf.reach(G, sets, delta_connected_table, table_as_string = True)
+    return sorted(A)
 
 # The DG as required by the function. 
 G = {"-->": DG_edges}
 
 # Sets
-A = [1]
-C = [3, 6]
+B = [4, 6]
+C = [2]
 
 # Compute the set B
-B = delta_connected_with_string(G, A, C, delta_connected_table)
-print(B)
+A = delta_connected_with_string(G, B, C, delta_connected_table)
+print(A)
 
 #Test
-B == B_true
+A == A_true
 
 # Write a function to solve delta-connection.
 # This function requires to specify path to rule table: 
-def delta_connected_with_txt(G, A, C):
-    sets = {"A": A, "C": C}
+def delta_connected_with_txt(G, B, C):
+    sets = {"B": B, "C": C}
     table_path = "./delta_connection_rule_table.txt"
-    B = cf.reach(G, sets, table_path)
-    return sorted(B)
+    A = cf.reach(G, sets, table_path)
+    return sorted(A)
   
   
   
