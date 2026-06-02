@@ -18,8 +18,8 @@ OUTPUT ...
 
 -->  | <--  | current in C
 -->  | -->  | current not in B and current not in C
-<--  | -->  | current not in C
-<--  | <--  | current not in B and current not in C
+<--  | <--  | current not in C
+<--  | -->  | current not in B and current not in C
 """
 
 # Example: A directed graph (DG) as a list of edges in a 2-columns matrix
