@@ -1,9 +1,9 @@
 EDGES --> <--
-SETS A, C
-START <-- AT A
-OUTPUT --> 
+SETS B, C
+START <-- AT B
+OUTPUT ...
 
---> | <-- | current in C
---> | --> | current not in C
-<-- | --> | current not in C
-<-- | <-- | current not in C
+-->  | <--  | current in C
+-->  | -->  | current not in B and current not in C
+<--  | -->  | current not in C
+<--  | <--  | current not in B and current not in C
