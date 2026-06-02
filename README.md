@@ -27,7 +27,7 @@ OUTPUT ...
 <--  | -->  | current not in C
 <--  | <--  | current not in C
 ```
-Consider the directed acyclic graph (DAG) $G=(V,E)$ with $V=\\{1,2,3,4,6,7\\}$ and directed edges $E=\\{1\rightarrow2, 2\rightarrow3, 4\rightarrow2, 4\rightarrow5, 5\rightarrow6, 7\rightarrow5\\}$. Take $A=\\{1\\}$, and $C=\\{3, 6\\}$. 
+Consider the directed acyclic graph (DAG) $G=(V,E)$ with $V=\\{1,2,3,4,6,7\\}$ and directed edges $E=\\{1\rightarrow2, 2\rightarrow3, 4\rightarrow2, 4\rightarrow5, 5\rightarrow6, 7\rightarrow5\\}$. Take $A=\\{1\\}$, and $C=\\{3, 6\\}$.  
 
 In R we implement this task as follows.
 ```r
