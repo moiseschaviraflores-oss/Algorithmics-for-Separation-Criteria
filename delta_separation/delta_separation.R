@@ -72,7 +72,7 @@ A == A_true
 
 # If we ask A, B and C to be disjoint we must get A_disj = {1, 5}
 A_disj <- delta_connected_with_string(G, A, C, delta_connected_table, disjoint = TRUE)
-print(B_disj)
+print(A_disj)
 
 # Write a function to solve delta-connection.
 # This function requires to specify path to rule table: 
