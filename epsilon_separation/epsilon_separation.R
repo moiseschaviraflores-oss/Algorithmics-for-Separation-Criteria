@@ -48,8 +48,8 @@ plot(DG,
      edge.arrow.size = 0.35,
      edge.size = 2.5)
 
-# For the DAG above, the set of nodes epsilon-connected to B = {6} given C = {2, 4, 5} is A = {1, 2, 3, 4, 5, 6, 7}.
-A_true <- c(1, 2, 3, 4, 5, 6, 7)
+# For the DAG above, the set of nodes epsilon-connected to B = {6} given C = {2, 4, 5} is A = {4, 5, 6, 7}.
+A_true <- c( 4, 5, 6, 7)
 
 # Write a function to solve epsilon-connection. 
 # It requires a rule table as string.
@@ -75,7 +75,7 @@ print(A)
 # We test
 A == A_true
 
-# If we ask A, B and C to be disjoint we must get A_disj = {1, 3, 7}
+# If we ask A, B and C to be disjoint we must get A_disj = {7}
 A_disj <- epsilon_connected_with_string(G, B, C, epsilon_connected_table, disjoint = TRUE)
 print(A_disj)
 
