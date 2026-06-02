@@ -5,5 +5,5 @@ OUTPUT ...
 
 -->  | <--  | current in C
 -->  | -->  | current not in B and current not in C
-<--  | -->  | current not in C
-<--  | <--  | current not in B and current not in C
+<--  | <--  | current not in C
+<--  | -->  | current not in B and current not in C
