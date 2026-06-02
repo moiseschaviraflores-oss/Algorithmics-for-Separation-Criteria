@@ -46,8 +46,8 @@ ig.plot(DG, target = ax,
     edge_arrow_width = 10 
 )
 
-# For the DG above, the set of nodes delta-connected to B given C is A = {1, 2, 4, 5, 6}.
-A_true = [1, 2, 4, 5, 6]
+# For the DG above, the set of nodes delta-connected to B given C is A = {4, 5, 6, 7}.
+A_true = [4, 5, 6, 7]
 
 # Write a function to solve delta-connection.
 # This function requires a rule table as string: 
