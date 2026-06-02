@@ -51,8 +51,8 @@ ig.plot(DG, target = ax,
     edge_arrow_width = 10 
 )
 
-# For the DG above, the set of nodes epsilon-connected to B given C is A = {1, 2, 3, 4, 5, 6, 7}.
-A_true = [1, 2, 3, 4, 5, 6, 7]
+# For the DG above, the set of nodes epsilon-connected to B given C is A = {4, 5, 6, 7}.
+A_true = [4, 5, 6, 7]
 
 # Write a function to solve epsilon-connection.
 # This function requires a rule table as string: 
