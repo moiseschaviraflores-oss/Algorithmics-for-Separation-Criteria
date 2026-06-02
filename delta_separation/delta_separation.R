@@ -20,8 +20,8 @@ OUTPUT ...
 
 -->  | <--  | current in C
 -->  | -->  | current not in B and current not in C
-<--  | -->  | current not in C
-<--  | <--  | current not in B and current not in C
+<--  | <--  | current not in C
+<--  | -->  | current not in B and current not in C
 "
 
 # Example: DG as a list of (directed) edges in a 2-columns matrix
