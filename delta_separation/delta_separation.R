@@ -12,7 +12,7 @@ library(latex2exp)
 library(ggplot2)
 
 #The following string is the rule table for finding delta-connected nodes to a set B by a set C:
-delta_rule_table <-"
+delta_connected_table <-"
 EDGES --> <--
 SETS B, C
 START <-- AT B
