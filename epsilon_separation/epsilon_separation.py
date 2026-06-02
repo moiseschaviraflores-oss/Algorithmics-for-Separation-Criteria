@@ -19,12 +19,12 @@ OUTPUT ... [...]
 
 --> [before] | <-- [after]  | current in C
 <-- [before] | <-- [before] | true
-<-- [before] | --> [before] | current not in B or current not in C
---> [before] | --> [before] | current not in B or current not in C
+<-- [before] | --> [before] | current not in B and current not in C
+--> [before] | --> [before] | current not in B and current not in C
 --> [after]  | <-- [after]  | current in C 
 <-- [after]  | <-- [after]  | current not in C
-<-- [after]  | --> [after]  | current not in B or current not in C
---> [after]  | --> [after]  | current not in B or current not in C
+<-- [after]  | --> [after]  | current not in B and current not in C
+--> [after]  | --> [after]  | current not in B and current not in C
 """
 
 # Example: A directed graph (DG) as a list of edges in a 2-columns matrix
