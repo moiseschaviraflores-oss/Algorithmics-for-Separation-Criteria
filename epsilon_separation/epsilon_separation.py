@@ -9,7 +9,7 @@ import ciflypy as cf
 import igraph as ig
 import matplotlib.pyplot as plt
 
-#The following string is the rule table for finding epsilon-connected nodes to a set A by a set C:
+#The following string is the rule table for finding epsilon-connected nodes to a set B by a set C:
 epsilon_connected_table = """
 EDGES --> <--
 SETS B, C
@@ -51,36 +51,36 @@ ig.plot(DG, target = ax,
     edge_arrow_width = 10 
 )
 
-# For the DG above, the set of nodes epsilon-connected to A given C is B = {2, 3, 4, 5, 6}.
-B_true = [2, 3, 4, 5, 6]
+# For the DG above, the set of nodes epsilon-connected to B given C is A = {1, 2, 3, 4, 5, 6, 7}.
+A_true = [1, 2, 3, 4, 5, 6, 7]
 
 # Write a function to solve epsilon-connection.
 # This function requires a rule table as string: 
-def epsilon_connected_with_string(G, A, C, epsilon_connected_table):
-    sets = {"A": A, "C": C}
-    B = cf.reach(G, sets, epsilon_connected_table, table_as_string = True)
-    return sorted(B)
+def epsilon_connected_with_string(G, B, C, epsilon_connected_table):
+    sets = {"B": B, "C": C}
+    A = cf.reach(G, sets, epsilon_connected_table, table_as_string = True)
+    return sorted(A)
 
 # The DG as required by the function. 
 G = {"-->": DG_edges}
 
 # Sets
-A = [1]
-C = [3, 6]
+B = [6]
+C = [2, 4, 5]
 
-# Compute the set B
-B = epsilon_connected_with_string(G, A, C, epsilon_connected_table)
-print(B)
+# Compute the set A
+A = epsilon_connected_with_string(G, B, C, epsilon_connected_table)
+print(A)
 
 #Test
-B == B_true
+A == A_true
 
 # Write a function to solve epsilon-connection.
 # This function requires to specify path to rule table: 
-def epsilon_connected_with_txt(G, A, C):
-    sets = {"A": A, "C": C}
+def epsilon_connected_with_txt(G, B, C):
+    sets = {"B": B, "C": C}
     table_path = "./epsilon_connection_rule_table.txt"
-    B = cf.reach(G, sets, table_path)
-    return sorted(B)
+    A = cf.reach(G, sets, table_path)
+    return sorted(A)
   
   
