@@ -11,7 +11,7 @@ library(igraph)
 library(latex2exp)
 library(ggplot2)
 
-#The following string is the rule table for finding delta-connected nodes to a set A by a set C:
+#The following string is the rule table for finding delta-connected nodes to a set B by a set C:
 delta_rule_table <-"
 EDGES --> <--
 SETS B, C
@@ -43,50 +43,50 @@ plot(DG,
      edge.arrow.size = 0.35,
      edge.size = 2.5)
 
-# For the DG above, the set of nodes delta-connected to A = {1} given C = {3, 6} is B = {2, 3, 4, 5, 6}.
-B_true <- c(2, 3, 4, 5, 6)
+# For the DG above, the set of nodes delta-connected to B = {4, 6} given C = {2} is A = {1, 2, 4, 5, 6}.
+A_true <- c(1, 2, 4, 5, 6)
 
 # Write a function to solve delta-connection. 
 # It requires a rule table as string.
 # It offers the possibility of computing a disjoint set form A and C (not disjoint by default).   
-delta_connected_with_string <- function(G, A, C, delta_connected_table, disjoint = FALSE){
-  Sets <- list("A" = A, "C" = C)
+delta_connected_with_string <- function(G, B, C, delta_connected_table, disjoint = FALSE){
+  Sets <- list("B" = B, "C" = C)
   B <- reach(G, Sets, delta_connected_table, tableAsString = TRUE)
-  if(disjoint == TRUE){B <- setdiff(B, c(A, C))}
-  return(sort(B))
+  if(disjoint == TRUE){A <- setdiff(A, c(B, C))}
+  return(sort(A))
 }
 
 # The DG in the plot is stored as required by "reach".
 G <- list("-->" = DG_edges)
 
 # required sets.
-A <- c(1)
-C <- c(3, 6)
+B <- c(4, 6)
+C <- c(2)
 
-# Compute the set B
-B <- delta_connected_with_string(G, A, C, delta_connected_table)
-print(B)
+# Compute the set A
+A <- delta_connected_with_string(G, B, C, delta_connected_table)
+print(A)
 
 # We test
-B == B_true
+A == A_true
 
-# If we ask A, B and C to be disjoint we must get B_disj = {2, 4, 5}
-B_disj <- delta_connected_with_string(G, A, C, delta_connected_table, disjoint = TRUE)
+# If we ask A, B and C to be disjoint we must get A_disj = {1, 5}
+A_disj <- delta_connected_with_string(G, A, C, delta_connected_table, disjoint = TRUE)
 print(B_disj)
 
 # Write a function to solve delta-connection.
 # This function requires to specify path to rule table: 
-delta_connected_with_txt <- function(G, A, C){
+delta_connected_with_txt <- function(G, B, C){
   # Sets
-  sets = list("A" = A, "C" = C)
+  sets = list("B" = B, "C" = C)
   
   # Path to table
   table_path = "./delta_connection_rule_table.txt"
   
   # Compute the set B of all nodes d_connected 
-  B = reach(G, sets, table_path)
+  A = reach(G, sets, table_path)
   
   #Return nodes by order of labels
-  return(sort(B))
+  return(sort(A))
 }
 
