@@ -62,7 +62,7 @@ sigma_table_mixed_graphs <- function(q){
     "EDGES --> <--, <->", 
     paste("SETS", paste(c("X","Z", SCC), collapse = ", ")),
     "COLORS plain, formereq",
-    "START <-- [outZ] AT X",
+    "START <-- [...] AT X",
     "OUTPUT ... [...]",
     "",
     paste("--> [plain]    | <-- [plain]    |", rule1),
