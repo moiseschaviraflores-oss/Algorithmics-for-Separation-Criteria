@@ -51,7 +51,7 @@ A_true <- c(1, 2, 4, 5, 6)
 # It offers the possibility of computing a disjoint set form A and C (not disjoint by default).   
 delta_connected_with_string <- function(G, B, C, delta_connected_table, disjoint = FALSE){
   Sets <- list("B" = B, "C" = C)
-  B <- reach(G, Sets, delta_connected_table, tableAsString = TRUE)
+  A <- reach(G, Sets, delta_connected_table, tableAsString = TRUE)
   if(disjoint == TRUE){A <- setdiff(A, c(B, C))}
   return(sort(A))
 }
