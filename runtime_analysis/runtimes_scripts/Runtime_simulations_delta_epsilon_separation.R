@@ -21,8 +21,8 @@ OUTPUT ...
 
 -->  | <--  | current in C
 -->  | -->  | current not in B and current not in C
-<--  | -->  | current not in C
-<--  | <--  | current not in B and current not in C
+<--  | <--  | current not in C
+<--  | -->  | current not in B and current not in C
 "
 # Preprocess rule table.
 delta_connected_table <- parseRuletable(delta_connected_table, tableAsString = TRUE)
