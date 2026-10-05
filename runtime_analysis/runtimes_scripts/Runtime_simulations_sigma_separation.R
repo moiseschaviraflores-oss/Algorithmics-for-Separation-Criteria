@@ -1,6 +1,6 @@
-# -----------------------------------------------------
-# Title: Runtime Complexity Analysis for sigma-separation:
-# -----------------------------------------------------
+# =====================================================
+#   Runtime Complexity Analysis for sigma-separation
+# =====================================================
 #
 # Required libraries:
 library(ciflyr)
@@ -15,23 +15,31 @@ library(scales)
 # Function to generate a rule table to find nodes *-connected to X by Z.
 # It requests the argument:
 # - q: number of nontrivial strongly connected components of the input graph G
-#It requires the number of strongly connected components q to be specified. 
+#  
 sigma_table_mixed_graphs <- function(q){
   
-  #Write strongly connected components C_1,...,C_q  
+  # ------------------------------------------------
+  # Write strongly connected components C_1,...,C_q 
+  # ------------------------------------------------
   SCC <- paste0("C_", 1:q)  
   
-  #Write SETS
+  # ---------------------------------------
+  # Write SETS including X, Z and the SCCs
+  # ---------------------------------------
   SETS <- paste("SETS", paste(c("X","Z", SCC), collapse = ", ")) 
   if(q == 0) {SETS <- "SETS X, Z"}
   
-  #Write a chain for "current in \sigma(next)"
+  # --------------------------------------------
+  # Write a chain for "current in \sigma(next)"
+  # --------------------------------------------
   current_in_sigma.next <- paste(
     paste0("(current in ", SCC, " and next in ", SCC, ")"),
     collapse = " or ")  
   if(q == 0){current_in_sigma.next <- "false"}
   
-  #We write the rules for table
+  # -----------------------------
+  # We write the rules for table
+  # -----------------------------
   rule1 <- "current in Z and next not in Z"
   
   rule2 <- paste("current in Z and (next in Z and (",current_in_sigma.next,"))",sep="") 
@@ -64,7 +72,9 @@ sigma_table_mixed_graphs <- function(q){
   
   rule16 <- current_in_sigma.next
   
-  # Write Rule Table
+  # --------------------------------
+  # Write rule table for sigma-sep.
+  # --------------------------------
   sigma_connected_table <- paste(
     "EDGES --> <--, <->", 
     SETS,
@@ -107,6 +117,8 @@ runtime_sigma_sep_q.fix <- function(P, M1, M2, Q, n_sim, n_rep){
   
   r_emp_sigma <- numeric(length(P))
   
+  sd_r_emp_sigma <- numeric(length(P))
+  
   for (i in 1:length(P)){
     #Set of nodes
     V <- 1:P[i]
@@ -139,18 +151,20 @@ runtime_sigma_sep_q.fix <- function(P, M1, M2, Q, n_sim, n_rep){
       
       time_sigma <- system.time(replicate(n_rep,reach(G,sets,sigma_rule_table)))
       
-      time_sigma_pre[j] <- time_sigma["user.self"] + time_sigma["sys.self"]
+      time_sigma_pre[j] <- (time_sigma["user.self"] + time_sigma["sys.self"])/n_rep
     }
-    r_emp_sigma[i] <- mean(time_sigma_pre)/n_rep
+    r_emp_sigma[i] <- mean(time_sigma_pre)
+    sd_r_emp_sigma[i] <- sd(time_sigma_pre)
   }
-  return(r_emp_sigma)
+  r_emp <- list("r" = r_emp_sigma, "sd" = sd_r_emp_sigma)
+  return(r_emp)
 }
 #
 #
 # Compute empirical runtime for p = 128, 256, 512, 1024, 2048, 4096
 #
 # A vector P with different numbers of nodes.
-P <- c(128, 256, 512, 1024, 2048, 4096)
+P <- c(128, 256, 512, 1024, 2048, 4096, 6144)
 Q <- as.integer(0.03*P)
 #
 # -----------------------------
@@ -180,8 +194,7 @@ M2_dense <- as.integer(0.03*P*(P-1))
 set.seed(1777)
 #
 # This vector will include emprirical runtime r_emp(p) for different graph sizes p (number of nodes).
-r_emp_sigma.sep_dense <- runtime_sigma_sep_q.fix(P, M1_dense, M2_dense, Q, n_sim = 12, n_rep = 80)
-#
+r_emp_sigma.sep_dense <- runtime_sigma_sep_q.fix(P, M1_dense, M2_dense, Q, n_sim = 12, n_rep = 10)
 #
 # -----------------------------
 # Relative projected runtime
@@ -221,7 +234,6 @@ Rel_Proj_Runtime <- function(P,r,g =c("linear","quadratic","cubic")){
   return(RPR)
 }
 #
-#
 # -----------------------------
 # Plot relative projected runtime
 # -----------------------------
@@ -231,18 +243,18 @@ Rel_Proj_Runtime <- function(P,r,g =c("linear","quadratic","cubic")){
 # Data frame for sigma-sep-sparse
 df1 <- data.frame( 
   X = P,              
-  Y1 = Rel_Proj_Runtime(P,r_emp_sigma.sep_sparse,g = "linear"),
-  Y2 = Rel_Proj_Runtime(P,r_emp_sigma.sep_sparse,g = "quadratic"),
-  Y3 = Rel_Proj_Runtime(P,r_emp_sigma.sep_sparse,g = "cubic"),
+  Y1 = Rel_Proj_Runtime(P,r_emp_sigma.sep_sparse$r,g = "linear"),
+  Y2 = Rel_Proj_Runtime(P,r_emp_sigma.sep_sparse$r,g = "quadratic"),
+  Y3 = Rel_Proj_Runtime(P,r_emp_sigma.sep_sparse$r,g = "cubic"),
   Context = "sigma-sep. - sparse"
 )
 #
 # Data frame for sigma-sep-dense
 df2 <- data.frame(
   X = P,
-  Y1 = Rel_Proj_Runtime(P,r_emp_sigma.sep_dense,g = "linear"),
-  Y2 = Rel_Proj_Runtime(P,r_emp_sigma.sep_dense,g = "quadratic"),
-  Y3 = Rel_Proj_Runtime(P,r_emp_sisgma.sep_dense,g = "cubic"),
+  Y1 = Rel_Proj_Runtime(P,r_emp_sigma.sep_dense$r,g = "linear"),
+  Y2 = Rel_Proj_Runtime(P,r_emp_sigma.sep_dense$r,g = "quadratic"),
+  Y3 = Rel_Proj_Runtime(P,r_emp_sigma.sep_dense$r,g = "cubic"),
   Context = "sigma-sep. - dense"
 )
 #
@@ -256,16 +268,16 @@ df$Context <- factor(
     "sigma-sep. - dense"
   )
 )
-
-
+#
+#
 df_long <- pivot_longer(
   df,
   cols = c(Y1, Y2, Y3),
   names_to = "Complexity",
   values_to = "Y"
 )
-
-
+#
+#
 ggplot(df_long,
        aes(x = X,
            y = Y,
@@ -310,4 +322,5 @@ ggplot(df_long,
     title = "Relative projected time for sigma-separation:",
     color = NULL
   )
-
+#
+#
