@@ -114,7 +114,7 @@ runtime_delta_sep <- function(P, Prob, n_sim, n_rep){
 # Compute empirical runtime for p = 128, 256, 512, 1024, 2048, 4096, 6144
 #
 # A vector P with different numbers of nodes.
-P <- as.integer(0.2*c(128, 256, 512, 1024, 2048, 4096, 6144))
+P <- c(128, 256, 512, 1024, 2048, 4096, 6144)
 #
 # -----------------------------
 # Sparse DGs with m = O(p)
@@ -208,7 +208,7 @@ runtime_epsilon_sep <- function(P, Prob, n_sim, n_rep){
 # Compute empirical runtime for p = 128, 256, 512, 1024, 2048, 4096, 6144
 #
 # A vector P with different numbers of nodes.
-P <- as.integer(0.2*c(128, 256, 512, 1024, 2048, 4096, 6144))
+P <- c(128, 256, 512, 1024, 2048, 4096, 6144)
 #
 # -----------------------------
 # Sparse DGs with m = O(p)
@@ -316,7 +316,7 @@ runtime_delta_sep_unif <- function(P, M, n_sim, n_rep){
 # Compute empirical runtime for p = 128, 256, 512, 1024, 2048, 4096, 6144
 #
 # A vector P with different numbers of nodes.
-P <- as.integer(0.2*c(128, 256, 512, 1024, 2048, 4096, 6144))
+P <- c(128, 256, 512, 1024, 2048, 4096, 6144)
 #
 # -----------------------------
 # Sparse DGs with m = O(p)
@@ -409,7 +409,7 @@ runtime_epsilon_sep_unif <- function(P, M, n_sim, n_rep){
 # Compute empirical runtime for p = 128, 256, 512, 1024, 2048, 4096, 6144
 #
 # A vector P with different numbers of nodes.
-P <- as.integer(0.2*c(128, 256, 512, 1024, 2048, 4096, 6144))
+P <- c(128, 256, 512, 1024, 2048, 4096, 6144)
 #
 # -----------------------------
 # Sparse DGs with m = O(p)
@@ -437,7 +437,6 @@ set.seed(42069)
 #
 # This vector will include emprirical runtime r_emp(p) for different graph sizes p (number of nodes).
 r_emp_epsilon.sep_dense_unif <- runtime_epsilon_sep_unif(P, M, n_sim = 12, n_rep = 80)
-#
 #
 #
 # ==================================================================
